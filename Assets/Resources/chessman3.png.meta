@@ -1,0 +1,332 @@
+fileFormatVersion: 2
+guid: 83f422c5ce19e1a419db7f1bc522070a
+timeCreated: 1486261270
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: chessman3_0
+    21300002: chessman3_1
+    21300004: chessman3_2
+    21300006: chessman3_3
+    21300008: chessman3_4
+    21300010: chessman3_5
+    21300012: chessman3_6
+    21300014: chessman3_7
+    21300016: chessman3_8
+    21300018: chessman3_9
+    21300020: chessman3_10
+    21300022: chessman3_11
+    21300024: chessman3_12
+    21300026: chessman3_13
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: chessman3_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 50
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -21, y: 25}
+        - {x: -25, y: 23}
+        - {x: -25, y: -23}
+        - {x: -19, y: -25}
+        - {x: 21, y: -25}
+        - {x: 25, y: -19}
+        - {x: 25, y: 16}
+        - {x: 21, y: 25}
+    - name: chessman3_1
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 50
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -22, y: 25}
+        - {x: -25, y: 23}
+        - {x: -25, y: -23}
+        - {x: -22, y: -25}
+        - {x: 25, y: -25}
+        - {x: 25, y: 24}
+        - {x: 22, y: 25}
+    - name: chessman3_2
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 50
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -15, y: 25}
+        - {x: -23, y: 17}
+        - {x: -25, y: 14}
+        - {x: -25, y: -15}
+        - {x: -21, y: -25}
+        - {x: 24, y: -25}
+        - {x: 25, y: -24}
+        - {x: 25, y: 19}
+        - {x: 23, y: 25}
+    - name: chessman3_3
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 50
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -20, y: 25}
+        - {x: -25, y: 14}
+        - {x: -25, y: -14}
+        - {x: -23, y: -17}
+        - {x: -16, y: -25}
+        - {x: 25, y: -25}
+        - {x: 25, y: 23}
+        - {x: 18, y: 25}
+    - name: chessman3_4
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 50
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 16, y: 25}
+        - {x: -24, y: 25}
+        - {x: -25, y: 22}
+        - {x: -25, y: -23}
+        - {x: -23, y: -25}
+        - {x: 24, y: -25}
+        - {x: 25, y: -22}
+        - {x: 25, y: 21}
+    - name: chessman3_5
+      rect:
+        serializedVersion: 2
+        x: 250
+        y: 50
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -21, y: 25}
+        - {x: -25, y: 23}
+        - {x: -25, y: -21}
+        - {x: -23, y: -25}
+        - {x: 23, y: -25}
+        - {x: 25, y: -17}
+        - {x: 25, y: 19}
+        - {x: 17, y: 25}
+    - name: chessman3_6
+      rect:
+        serializedVersion: 2
+        x: 300
+        y: 50
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -25, y: 25}
+        - {x: -25, y: -19}
+        - {x: -23, y: -25}
+        - {x: 16, y: -25}
+        - {x: 25, y: -18}
+        - {x: 25, y: 19}
+        - {x: 23, y: 25}
+    - name: chessman3_7
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -21, y: 25}
+        - {x: -25, y: 18}
+        - {x: -25, y: -24}
+        - {x: -21, y: -25}
+        - {x: 22, y: -25}
+        - {x: 25, y: -22}
+        - {x: 25, y: 20}
+        - {x: 22, y: 25}
+    - name: chessman3_8
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 0
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 23, y: 25}
+        - {x: -21, y: 25}
+        - {x: -25, y: 24}
+        - {x: -25, y: -21}
+        - {x: -15, y: -25}
+        - {x: 16, y: -25}
+        - {x: 25, y: -18}
+        - {x: 25, y: 18}
+        - {x: 24, y: 24}
+    - name: chessman3_9
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 0
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -15, y: 25}
+        - {x: -25, y: 15}
+        - {x: -25, y: -18}
+        - {x: -17, y: -25}
+        - {x: 20, y: -25}
+        - {x: 25, y: -23}
+        - {x: 25, y: 21}
+        - {x: 24, y: 25}
+    - name: chessman3_10
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 0
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -17, y: 25}
+        - {x: -25, y: 19}
+        - {x: -25, y: -24}
+        - {x: -21, y: -25}
+        - {x: 24, y: -25}
+        - {x: 25, y: -22}
+        - {x: 25, y: 16}
+        - {x: 21, y: 25}
+    - name: chessman3_11
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 0
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -25, y: 25}
+        - {x: -25, y: -25}
+        - {x: 25, y: -25}
+        - {x: 25, y: 21}
+        - {x: 24, y: 25}
+    - name: chessman3_12
+      rect:
+        serializedVersion: 2
+        x: 250
+        y: 0
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -18, y: 25}
+        - {x: -25, y: 23}
+        - {x: -25, y: -24}
+        - {x: -23, y: -25}
+        - {x: 24, y: -25}
+        - {x: 25, y: -22}
+        - {x: 25, y: 18}
+        - {x: 20, y: 25}
+    - name: chessman3_13
+      rect:
+        serializedVersion: 2
+        x: 300
+        y: 0
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -23, y: 25}
+        - {x: -25, y: 18}
+        - {x: -25, y: -25}
+        - {x: 25, y: -25}
+        - {x: 25, y: 17}
+        - {x: 16, y: 25}
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

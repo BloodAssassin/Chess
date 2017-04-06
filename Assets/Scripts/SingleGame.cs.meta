@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 52175eb18c4c949458c84ecd21d5d93b
+timeCreated: 1486733069
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - Selected: {instanceID: 0}
+  - Path: {instanceID: 0}
+  - WinPlane: {instanceID: 0}
+  - LosePlane: {instanceID: 0}
+  - clickMusic: {instanceID: 0}
+  - winMusic: {instanceID: 0}
+  - loseMusic: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
