@@ -5,21 +5,45 @@ using System.Text;
 using System.Collections.Generic;
 using System;
 using UnityEngine.SceneManagement;
+using System.Text.RegularExpressions;
 
 public class AccountManager : MonoBehaviour
 {
-    //两个panel（登陆和注册）
+    //各个panel界面
     public GameObject LoginPanel;
-    public GameObject RegisterPanel;
+    public GameObject RegisterPanel1;
+    public GameObject RegisterPanel2;
+    public GameObject RegisterPanel3;
+    public GameObject FindPasswordPanel1;
+    public GameObject FindPasswordPanel2;
+    public GameObject FindPasswordPanel3;
 
     //LoginPanel上的各种控件
-    public GameObject IF_Account;
-    public GameObject IF_Password;
+    public GameObject IF_LoginEmail;
+    public GameObject IF_LoginPassword;
 
-    //RegisterPanel上的各种控件
-    public GameObject IF_Emaill;
-    public GameObject IF_Name;
+    //RegisterPanel1上的各种控件   
+    public GameObject IF_RegisterName;
     public GameObject IF_RegisterPassword;
+
+    //RegisterPanel2上的各种控件   
+    public GameObject IF_RegisterEmaill;
+
+    //FindPasswordPanel1上的各种控件   
+    public GameObject IF_FindPasswordEmaill;
+    public GameObject IF_FindPasswordCode;
+
+    //FindPasswordPanel2上的各种控件   
+    public GameObject IF_FindPasswordPassword1;
+    public GameObject IF_FindPasswordPassword2;
+
+
+    public string registerName = "";
+    public string registerPassword = "";
+    public string registerEmail = "";
+
+    public string findPasswordEmail = "";
+
 
 
     #region 接收来自服务器的消息，处理消息
@@ -67,8 +91,7 @@ public class AccountManager : MonoBehaviour
         if (data[2] == 0)
         {
             Debug.Log("注册成功");
-            //弹出消息窗，告知用户注册成功
-            //在弹出窗中点击确认键，回到登录界面
+            RegisterPanel3.SetActive(true);
         }
         else if (data[2] == 1)
         {
@@ -115,11 +138,11 @@ public class AccountManager : MonoBehaviour
     {
         if (data[2] == 0)
         {
-
+            Debug.Log("要找回密码的邮箱存在");
         }
         else if (data[2] == 1)
         {
-
+            Debug.Log("要找回密码的邮箱不存在");
         }
     }
 
@@ -131,11 +154,12 @@ public class AccountManager : MonoBehaviour
     {
         if (data[2] == 0)
         {
-
+            Debug.Log("验证码正确");
+            FindPasswordPanel2.SetActive(true);
         }
         else if (data[2] == 1)
         {
-
+            Debug.Log("验证码错误");
         }
     }
 
@@ -147,11 +171,11 @@ public class AccountManager : MonoBehaviour
     {
         if (data[2] == 0)
         {
-
+            FindPasswordPanel3.SetActive(true);
         }
         else if (data[2] == 1)
         {
-
+            Debug.Log("重置密码失败");
         }
     }
 
@@ -171,37 +195,16 @@ public class AccountManager : MonoBehaviour
         byte[] _name = Encoding.UTF8.GetBytes(name);
         byte[] _password = Encoding.UTF8.GetBytes(password);
 
-        if (!EmailIsRight(_email))
+        byte[] data = CreatRegisterBytes(_email, _name, _password);
+        //开始发送
+        try
         {
-            //告知用户email格式错误
-            Debug.Log("email格式错误");
-            return;
+            Common.connSocket.Send(data);
         }
-        else if (!NameIsRight(_name))
+        catch (Exception ex)
         {
-            //告知用户name格式错误
-            Debug.Log("name格式错误");
-            return;
-        }
-        else if (!PasswordIsRight(_password))
-        {
-            //告知用户password格式错误
-            Debug.Log("password格式错误");
-            return;
-        }
-        else
-        {
-            byte[] data = CreatRegisterBytes(_email, _name, _password);
-            //开始发送
-            try
-            {
-                Common.connSocket.Send(data);
-            }
-            catch (Exception ex)
-            {
-                Debug.Log(ex.Message);
-            }
-        }
+            Debug.Log(ex.Message);
+        }   
     }
 
     /// <summary>
@@ -212,31 +215,16 @@ public class AccountManager : MonoBehaviour
         byte[] _email = Encoding.UTF8.GetBytes(email);
         byte[] _password = Encoding.UTF8.GetBytes(password);
 
-        if (!EmailIsRight(_email))
+        byte[] data = CreatLoginBytes(_email, _password);
+        //开始发送
+        try
         {
-            //告知用户email格式错误
-            Debug.Log("email格式错误");
-            return;
+            Common.connSocket.Send(data);
         }
-        else if (!PasswordIsRight(_password))
+        catch (Exception ex)
         {
-            //告知用户password格式错误
-            Debug.Log("password格式错误");
-            return;
-        }
-        else
-        {
-            byte[] data = CreatLoginBytes(_email, _password);
-            //开始发送
-            try
-            {
-                Common.connSocket.Send(data);
-            }
-            catch (Exception ex)
-            {
-                Debug.Log(ex.Message);
-            }
-        }
+            Debug.Log(ex.Message);
+        }         
     }
 
     #region 找回密码
@@ -244,25 +232,66 @@ public class AccountManager : MonoBehaviour
     /// <summary>
     /// 向服务器申请找回密码
     /// </summary>
-    public void SendFindPasswordMessageToServer()
+    private void SendFindPasswordMessageToServer(string email)
     {
+         byte[] _email = Encoding.UTF8.GetBytes(email);
 
+         byte[] data = CreatFindPasswordBytes1(_email);
+
+         //开始发送
+         try
+         {
+             Common.connSocket.Send(data);
+         }
+         catch (Exception ex)
+         {
+             Debug.Log(ex.Message);
+         }
     }
 
     /// <summary>
     /// 向服务器申请验证邮箱
     /// </summary>
-    public void SendIdentifyingCodeMessageToServer()
+    private void SendIdentifyingCodeMessageToServer(string email, string code)
     {
+        byte[] _email = Encoding.UTF8.GetBytes(email);
 
+        byte[] _code = Encoding.UTF8.GetBytes(code);
+
+        byte[] data = CreatFindPasswordBytes2(_email, _code);
+
+        //开始发送
+        try
+        {
+            Common.connSocket.Send(data);
+        }
+        catch (Exception ex)
+        {
+            Debug.Log(ex.Message);
+        }
     }
 
     /// <summary>
     /// 向服务器申请重新设置密码
     /// </summary>
-    public void SendResetPasswordMessageToServer()
+    public void SendResetPasswordMessageToServer(string email, string password)
     {
+        //[ 命令04(2位) | 账户邮箱(20位) | 账户密码(20位) | ...]
+        byte[] _email = Encoding.UTF8.GetBytes(email);
 
+        byte[] _password = Encoding.UTF8.GetBytes(password);
+
+        byte[] data = CreatFindPasswordBytes3(_email, _password);
+
+        //开始发送
+        try
+        {
+            Common.connSocket.Send(data);
+        }
+        catch (Exception ex)
+        {
+            Debug.Log(ex.Message);
+        }
     }
 
     #endregion
@@ -277,8 +306,13 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     public void btn_SwitchToRegister()
     {
-        LoginPanel.SetActive(false);
-        RegisterPanel.SetActive(true);
+        //LoginPanel.SetActive(false);
+        RegisterPanel1.SetActive(true);
+        //RegisterPanel2.SetActive(false);
+        //RegisterPanel3.SetActive(false);
+        //FindPasswordPanel1.SetActive(false);
+        //FindPasswordPanel2.SetActive(false);
+        //FindPasswordPanel3.SetActive(false);
     }
 
     /// <summary>
@@ -287,7 +321,12 @@ public class AccountManager : MonoBehaviour
     public void btn_SwitchToLogin()
     {
         LoginPanel.SetActive(true);
-        RegisterPanel.SetActive(false);
+        RegisterPanel1.SetActive(false);
+        RegisterPanel2.SetActive(false);
+        RegisterPanel3.SetActive(false);
+        FindPasswordPanel1.SetActive(false);
+        FindPasswordPanel2.SetActive(false);
+        FindPasswordPanel3.SetActive(false);
     }
 
     /// <summary>
@@ -295,39 +334,80 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     public void btn_SwitchToFindPassword()
     {
-        //跳转到找回密码页面
+        //LoginPanel.SetActive(false);
+        FindPasswordPanel1.SetActive(true);
+    }
+
+
+    /// <summary>
+    /// 注册账号(注册界面1)
+    /// </summary>
+    public void btn_RegisterAccount1()
+    {
+        registerName = IF_RegisterName.GetComponent<InputField>().text;
+        registerPassword = IF_RegisterPassword.GetComponent<InputField>().text;
+
+        //检测输入的昵称和密码是否合法
+        if (NameIsRight(registerName) && PasswordIsRight(registerPassword))
+        {
+            //跳转到下一个界面
+            RegisterPanel2.SetActive(true);
+        }
+        else if(!NameIsRight(registerName))
+        {
+            //弹出窗口提示错误
+            Debug.Log("昵称过长");
+        }
+        else if (!PasswordIsRight(registerPassword))
+        {
+            //弹出窗口提示错误
+            Debug.Log("密码过长");
+        }
+        
     }
 
     /// <summary>
-    /// 注册账号
+    /// 注册账号(注册界面2)
     /// </summary>
-    public void btn_RegisterAccount()
+    public void btn_RegisterAccount2()
     {
-        string email = IF_Emaill.GetComponent<InputField>().text;
-        string name = IF_Name.GetComponent<InputField>().text;
-        string password = IF_RegisterPassword.GetComponent<InputField>().text;
+        registerEmail = IF_RegisterEmaill.GetComponent<InputField>().text;
 
-        SendRegisterMessageToServer(email, name, password);
+        //检测输入的邮箱是否有问题
+        if (EmailIsRight(registerEmail))
+        {
+            SendRegisterMessageToServer(registerEmail, registerName, registerPassword);
+        }
+        else
+        {
+            Debug.Log("输入的邮箱不合法");
+        }
+        
     }
+
 
     /// <summary>
     /// 登陆账号
     /// </summary>
     public void btn_LoginAccount()
     {
-        string email = IF_Account.GetComponent<InputField>().text;
-        string password = IF_Password.GetComponent<InputField>().text;
+        string email = IF_LoginEmail.GetComponent<InputField>().text;
+        string password = IF_LoginPassword.GetComponent<InputField>().text;
 
         SendLoginMessageToServer(email, password);
     }
+
 
     /// <summary>
     /// 向服务器申请获取验证码
     /// </summary>
     public void btn_FindPassword()
     {
-        //验证邮箱格式
-        //发送邮箱给服务器
+        //获取邮箱地址
+        findPasswordEmail = IF_FindPasswordEmaill.GetComponent<InputField>().text;
+
+        //发送获取验证码的请求给服务器
+        SendFindPasswordMessageToServer(findPasswordEmail);
     }
 
     /// <summary>
@@ -335,16 +415,38 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     public void btn_SendIdentifyingCode()
     {
+        //获取验证码
+        string code = IF_FindPasswordCode.GetComponent<InputField>().text;
+
+        Debug.Log("发送的验证码为："+code);
+
         //发送验证码给服务器
+        SendIdentifyingCodeMessageToServer(findPasswordEmail, code);
     }
 
     /// <summary>
     /// 向服务器申请重新设置密码
     /// </summary>
-    public void ResetPassword()
+    public void btn_ResetPassword()
     {
+        //获取两次输入的密码
+        string password1 = IF_FindPasswordPassword1.GetComponent<InputField>().text;
+        string password2 = IF_FindPasswordPassword2.GetComponent<InputField>().text;
+
         //验证密码格式
-        //发送新密码给服务器
+        if (!PasswordIsRight(password1)||!PasswordIsRight(password2))
+        {
+            Debug.Log("输入的密码不合法");
+        }
+        else if (password1 != password2)
+        {
+            Debug.Log("两次输入的密码不一致");
+        }
+        else
+        {
+            //发送新密码给服务器
+            SendResetPasswordMessageToServer(findPasswordEmail,password1);
+        }       
     }
 
 
@@ -358,9 +460,17 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     /// <param name="email"></param>
     /// <returns></returns>
-    private bool EmailIsRight(byte[] email)
+    private bool EmailIsRight(string email)
     {
-        if (email.Length <= 20 && email.Length > 0)
+        //正则表达式字符串
+        string emailStr = @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$";
+
+        //邮箱正则表达式对象
+        Regex emailReg = new Regex(emailStr);
+
+        byte[] _email = Encoding.UTF8.GetBytes(email);
+
+        if (_email.Length <= 20 && _email.Length > 0 && emailReg.IsMatch(email))
         {
             return true;
         }
@@ -375,9 +485,11 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    private bool NameIsRight(byte[] name)
+    private bool NameIsRight(string name)
     {
-        if (name.Length <= 30 && name.Length > 0)
+        byte[] _name = Encoding.UTF8.GetBytes(name);
+
+        if (_name.Length <= 30 && _name.Length > 0)
         {
             return true;
         }
@@ -392,9 +504,11 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    private bool PasswordIsRight(byte[] password)
+    private bool PasswordIsRight(string password)
     {
-        if (password.Length <= 20 && password.Length > 0)
+        byte[] _password = Encoding.UTF8.GetBytes(password);
+
+        if (_password.Length <= 20 && _password.Length > 0)
         {
             return true;
         }
@@ -462,6 +576,86 @@ public class AccountManager : MonoBehaviour
 
         list.Insert(0, 0);
         list.Insert(1, 1);
+
+        list.AddRange(_email);
+        //_email 不够20位
+        for (int i = 0; i < 20 - _email.Length; i++)
+        {
+            list.Add(0);
+        }
+
+        list.AddRange(_password);
+        //_password 不够20位
+        for (int i = 0; i < 20 - _password.Length; i++)
+        {
+            list.Add(0);
+        }
+
+        return list.ToArray();
+    }
+
+    /// <summary>
+    /// 打包要发送的获取验证码的消息
+    /// </summary>
+    /// <param name="_email"></param>
+    /// <returns></returns>
+    private byte[] CreatFindPasswordBytes1(byte[] _email)
+    {
+        //[ 命令02(2位) | 账户邮箱(20位) | ...]
+        List<byte> list = new List<byte>();
+
+        list.Insert(0, 0);
+        list.Insert(1, 2);
+
+        list.AddRange(_email);
+        //_email 不够20位
+        for (int i = 0; i < 20 - _email.Length; i++)
+        {
+            list.Add(0);
+        }
+      
+        return list.ToArray();
+    }
+
+    /// <summary>
+    /// 打包要发送的验证验证码的消息
+    /// </summary>
+    /// <param name="_email"></param>
+    /// <param name="_code"></param>
+    /// <returns></returns>
+    private byte[] CreatFindPasswordBytes2(byte[] _email, byte[] _code)
+    {
+        //[ 命令03(2位) | 账户邮箱(20位) | 验证码(6位) | ...]
+        List<byte> list = new List<byte>();
+
+        list.Insert(0, 0);
+        list.Insert(1, 3);
+
+        list.AddRange(_email);
+        //_email 不够20位
+        for (int i = 0; i < 20 - _email.Length; i++)
+        {
+            list.Add(0);
+        }
+
+        list.AddRange(_code);
+
+        return list.ToArray();
+    }
+
+    /// <summary>
+    /// 打包要发送的重置密码的消息
+    /// </summary>
+    /// <param name="_email"></param>
+    /// <param name="_code"></param>
+    /// <returns></returns>
+    private byte[] CreatFindPasswordBytes3(byte[] _email, byte[] _password)
+    {
+        //[ 命令04(2位) | 账户邮箱(20位) | 账户密码(20位) | ...]
+        List<byte> list = new List<byte>();
+
+        list.Insert(0, 0);
+        list.Insert(1, 4);
 
         list.AddRange(_email);
         //_email 不够20位

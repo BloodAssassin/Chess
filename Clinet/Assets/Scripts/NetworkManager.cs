@@ -15,8 +15,8 @@ public class NetworkManager : MonoBehaviour
     /// <summary>
     /// 连接服务器的ip
     /// </summary>
-    //public static string _ip = "115.159.207.34"; //连接云服务器
-    public static string _ip = "127.0.0.1"; //连接本地
+    public static string _ip = "115.159.207.34"; //连接云服务器
+    //public static string _ip = "127.0.0.1"; //连接本地
 
     /// <summary>
     /// 连接服务器的端口

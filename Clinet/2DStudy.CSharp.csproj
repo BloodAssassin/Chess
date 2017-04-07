@@ -80,6 +80,7 @@
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\GameModeSelect.cs" />
     <Compile Include="Assets\Scripts\MessageCenter\AccountManager.cs" />
+    <Compile Include="Assets\Scripts\MessageCenter\BattleManager.cs" />
     <Compile Include="Assets\Scripts\MessageCenter\ProcessNetMessage.cs" />
     <Compile Include="Assets\Scripts\NetGame.cs" />
     <Compile Include="Assets\Scripts\NetworkManager.cs" />

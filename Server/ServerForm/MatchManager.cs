@@ -12,8 +12,6 @@ namespace ServerForm
     class MatchManager
     {
 
-
-
         /// <summary>
         /// 接收到来自客户端的关于匹配系统的相关指令，并分类处理
         /// </summary>
@@ -55,7 +53,7 @@ namespace ServerForm
                 SqlAccess sql = new SqlAccess();
 
                 //从“BattleInformation”表中选择“email=email”的“score”的数据
-                DataSet ds = sql.SelectWhere("AccountManager", new string[] { "password" }, new string[] { "email" }, new string[] { "=" }, new string[] { email });
+                DataSet ds = sql.SelectWhere("BattleInformation", new string[] { "score" }, new string[] { "email" }, new string[] { "=" }, new string[] { email });
 
                 //遍历这些数据，获取用户的积分
                 if (ds != null)
@@ -181,7 +179,7 @@ namespace ServerForm
 
             if (Common.connSocket.ContainsKey(blackIp))
             {
-                Common.connSocket[redIp].Send(CreatBytes(redIp, redEmail, false));
+                Common.connSocket[blackIp].Send(CreatBytes(redIp, redEmail, false));
             }
         }
 

@@ -220,7 +220,7 @@ namespace ServerForm
                         case 1:
                             //服务器保存发送方的IP、邮箱和其棋子的颜色，并寻求配对
                             MatchManager MM = new MatchManager();
-                            MatchingRival(data,ip);
+                            MM.ReceiveMessage(data,ip);
                             break;
                         case 2:
                             //接收发送方发来的移动棋子的消息，并转发给接收方
@@ -342,85 +342,91 @@ namespace ServerForm
 
         #region 服务端对从客户端接收到的消息，通过协议进行分类处理
 
-        /// <summary>
-        /// 匹配对手
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="ip"></param>
-        void MatchingRival(byte[] data, string ip)
-        {
-            string color = data[1].ToString();
-            string[] playerMessage = new string[2];
-            playerMessage[0] = ip;
-            playerMessage[1] = color;
-            player.Add(playerMessage);
-            foreach (string[] s in player)
-            {
-                if (s[1] != color)
-                {
-                    string rivalIp = s[0];
-                    player.Remove(s);
-                    player.RemoveAt(player.Count - 1);
-                    int tmp = data[1];
-                    if (tmp == 1)
-                    {
-                        SendRivalMessageToOther(ip, rivalIp);
-                    }
-                    else
-                    {
-                        SendRivalMessageToOther(rivalIp, ip);
-                    }
 
-                    return;
-                }
-            }
-        }
+        #region 一个简单的匹配对手的方法
 
-        /// <summary>
-        /// 将匹配到的对手的信息分别发送给两个客户端
-        /// </summary>
-        /// <param name="redIp"></param>
-        /// <param name="blackIp"></param>
-        void SendRivalMessageToOther(string redIp, string blackIp)
-        {
-            if (Common.connSocket.ContainsKey(redIp))
-            {
-                string allIp = string.Format("{0},{1}", redIp.Trim('\0'), blackIp.Trim('\0'));
-                byte[] sendIp = Encoding.UTF8.GetBytes(allIp);
-                List<byte> list = new List<byte>();
-                list.Insert(0, 4);
-                list.AddRange(sendIp);
-                //sendIp 不够50位
-                if (sendIp.Length < 50)
-                {
-                    for (int i = 0; i < 50 - sendIp.Length; i++)
-                    {
-                        list.Add(0);
-                    }
-                }
-                list.Insert(51, 1);
-                Common.connSocket[redIp].Send(list.ToArray());
-            }
+        ///// <summary>
+        ///// 匹配对手
+        ///// </summary>
+        ///// <param name="data"></param>
+        ///// <param name="ip"></param>
+        //void MatchingRival(byte[] data, string ip)
+        //{
+        //    string color = data[1].ToString();
+        //    string[] playerMessage = new string[2];
+        //    playerMessage[0] = ip;
+        //    playerMessage[1] = color;
+        //    player.Add(playerMessage);
+        //    foreach (string[] s in player)
+        //    {
+        //        if (s[1] != color)
+        //        {
+        //            string rivalIp = s[0];
+        //            player.Remove(s);
+        //            player.RemoveAt(player.Count - 1);
+        //            int tmp = data[1];
+        //            if (tmp == 1)
+        //            {
+        //                SendRivalMessageToOther(ip, rivalIp);
+        //            }
+        //            else
+        //            {
+        //                SendRivalMessageToOther(rivalIp, ip);
+        //            }
 
-            if (Common.connSocket.ContainsKey(blackIp))
-            {
-                string allIp = string.Format("{0},{1}", blackIp.Trim('\0'), redIp.Trim('\0'));
-                byte[] sendIp = Encoding.UTF8.GetBytes(allIp);
-                List<byte> list = new List<byte>();
-                list.Insert(0, 4);
-                list.AddRange(sendIp);
-                //sendIp 不够50位
-                if (sendIp.Length < 50)
-                {
-                    for (int i = 0; i < 50 - sendIp.Length; i++)
-                    {
-                        list.Add(0);
-                    }
-                }
-                list.Insert(51, 0);
-                Common.connSocket[blackIp].Send(list.ToArray());
-            }
-        }
+        //            return;
+        //        }
+        //    }
+        //}
+
+        ///// <summary>
+        ///// 将匹配到的对手的信息分别发送给两个客户端
+        ///// </summary>
+        ///// <param name="redIp"></param>
+        ///// <param name="blackIp"></param>
+        //void SendRivalMessageToOther(string redIp, string blackIp)
+        //{
+        //    if (Common.connSocket.ContainsKey(redIp))
+        //    {
+        //        string allIp = string.Format("{0},{1}", redIp.Trim('\0'), blackIp.Trim('\0'));
+        //        byte[] sendIp = Encoding.UTF8.GetBytes(allIp);
+        //        List<byte> list = new List<byte>();
+        //        list.Insert(0, 4);
+        //        list.AddRange(sendIp);
+        //        //sendIp 不够50位
+        //        if (sendIp.Length < 50)
+        //        {
+        //            for (int i = 0; i < 50 - sendIp.Length; i++)
+        //            {
+        //                list.Add(0);
+        //            }
+        //        }
+        //        list.Insert(51, 1);
+        //        Common.connSocket[redIp].Send(list.ToArray());
+        //    }
+
+        //    if (Common.connSocket.ContainsKey(blackIp))
+        //    {
+        //        string allIp = string.Format("{0},{1}", blackIp.Trim('\0'), redIp.Trim('\0'));
+        //        byte[] sendIp = Encoding.UTF8.GetBytes(allIp);
+        //        List<byte> list = new List<byte>();
+        //        list.Insert(0, 4);
+        //        list.AddRange(sendIp);
+        //        //sendIp 不够50位
+        //        if (sendIp.Length < 50)
+        //        {
+        //            for (int i = 0; i < 50 - sendIp.Length; i++)
+        //            {
+        //                list.Add(0);
+        //            }
+        //        }
+        //        list.Insert(51, 0);
+        //        Common.connSocket[blackIp].Send(list.ToArray());
+        //    }
+        //}
+
+        #endregion
+
 
         /// <summary>
         /// 将一方悔棋的信息发送给另一方
@@ -505,14 +511,23 @@ namespace ServerForm
                 }
 
                 //删除其在匹配队列中保存的数据（若存在）
-                foreach (string[] s in player)
+                foreach (string[] s in redMatchPool)
                 {
                     if (s[0] == outIp)
                     {
-                        player.Remove(s);
+                        redMatchPool.Remove(s);
                         break;
                     }
                 }
+                foreach (string[] s in blackMatchPool)
+                {
+                    if (s[0] == outIp)
+                    {
+                        blackMatchPool.Remove(s);
+                        break;
+                    }
+                }
+
             }));
 
             clientSocket.Shutdown(SocketShutdown.Receive);

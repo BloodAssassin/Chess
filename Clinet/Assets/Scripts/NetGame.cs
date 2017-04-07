@@ -40,20 +40,16 @@ public class NetGame : GameManager
 
     //对手的IP地址
     public static string _rivalIP = "";
+    //对手的Email地址
+    public static string _rivalEmail = "";
 
     public float lastTime;
 
-    //选择颜色的两个Button所在的Plane
-    public GameObject _selectColorPlane;
-
-    //UI物体
-    public GameObject _hintMessage;
-    public GameObject _canvas;
-    public GameObject _returnToMenuButton;
-    public GameObject _selectColorPanel;
-
     //StoneManager脚本
     public StoneManager SM;
+    //BattleManager脚本
+    public BattleManager BM;
+
 
     void Start()
     {
@@ -68,11 +64,7 @@ public class NetGame : GameManager
         seletcedChess = Resources.LoadAll("_newSelectChess");
 
         SM = (StoneManager)GameObject.Find("ChessBoard").GetComponent("StoneManager");
-
-        _canvas = GameObject.Find("Canvas");
-        _returnToMenuButton = _canvas.transform.Find("ReturnToMenuButton").gameObject;
-        _hintMessage = _canvas.transform.Find("HintMessage").gameObject;
-        _selectColorPanel = _canvas.transform.Find("SelectColorPanel").gameObject;
+        BM = (BattleManager)GameObject.Find("BattleManager").GetComponent("BattleManager");
     }
 
     void Update()
@@ -97,45 +89,8 @@ public class NetGame : GameManager
         SendClickMessageToServer(id, row, col);
     }
 
-    /// <summary>
-    /// 连接出现问题时，UI相应
-    /// </summary>
-    public void ConnectProblem()
-    {
-        _hintMessage.SetActive(true);
-        _selectColorPanel.SetActive(false);
-        _returnToMenuButton.SetActive(true);
-        _hintMessage.GetComponent<Text>().text = "联网暂时不可用\n点击屏幕任意位置退回菜单";
-    }
-
 
     #region 按钮点击事件
-
-    /// <summary>
-    /// 选择红棋
-    /// </summary>
-    public void RedButton()
-    {
-        //将选择红棋的消息发送给服务器
-        SendColorMessageToServer(true);
-
-        _selectColorPlane.SetActive(false);
-        _hintMessage.SetActive(true);
-        _hintMessage.GetComponent<Text>().text = "正在匹配对手，请耐心等待...";
-    }
-
-    /// <summary>
-    /// 选择黑棋
-    /// </summary>
-    public void BlackButton()
-    {
-        //将选择黑棋的消息发送给服务器
-        SendColorMessageToServer(false);
-
-        _selectColorPlane.SetActive(false);
-        _hintMessage.SetActive(true);
-        _hintMessage.GetComponent<Text>().text = "正在匹配对手，请耐心等待...";
-    }
 
     /// <summary>
     /// 悔棋，并向对手发送消息
@@ -159,7 +114,7 @@ public class NetGame : GameManager
         //告诉服务器自己选择重开，服务器告诉对手玩家已放弃比赛
         Common.connSocket.Close();
         _rivalIP = "";
-        _hintMessage.SetActive(false);
+        BM._hintMessage.SetActive(false);
         SceneManager.LoadScene("NetGame");
     }
 
@@ -200,7 +155,7 @@ public class NetGame : GameManager
                     BackFromNetwork();
                     break;
                 case 4:
-                    InitFromNetwork(buffer);
+                    //InitFromNetwork(buffer);
                     break;
                 case 5:
                     DisconnectFromNetwork();
@@ -243,26 +198,16 @@ public class NetGame : GameManager
     }
 
     /// <summary>
-    /// 接收初始化的消息
+    /// 初始化棋盘
     /// </summary>
     /// <param name="buffer"></param>
-    void InitFromNetwork(byte[] buffer)
-    {
-        //协议：
-        //[ 命令4：初始化棋盘(1位) | ip(自己的ip和对方的ip 50位) | 持子的颜色(1位) | ...]
-
-        //获取自己的IP地址和对手的IP地址
-        string allIP = Encoding.UTF8.GetString(buffer, 1, 50);
-        string[] temp = allIP.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-        NetworkManager._myIP = temp.Length > 0 ? temp[0].Trim('\0') : "";
-        _rivalIP = temp.Length > 0 ? temp[1].Trim('\0') : "";
-
+    public void InitFromNetwork(bool isRed)
+    {      
         //判断自己是红棋还是黑棋
-        bool beRedSide = buffer[51] > 0 ? true : false;
+        bool beRedSide = isRed;
         SM.StoneInit(beRedSide);
         _beSide = beRedSide;
-        _hintMessage.SetActive(false);
+        BM._hintMessage.SetActive(false);
     }
 
     /// <summary>
@@ -270,8 +215,8 @@ public class NetGame : GameManager
     /// </summary>
     void DisconnectFromNetwork()
     {
-        _hintMessage.SetActive(true);
-        _hintMessage.GetComponent<Text>().text = "您的对手已离线...";
+        BM._hintMessage.SetActive(true);
+        BM._hintMessage.GetComponent<Text>().text = "您的对手已离线...";
 
         StartCoroutine(ToolManager.DelayToInvokeDo(() => { Restart(); }, 2f));
     }
@@ -320,7 +265,7 @@ public class NetGame : GameManager
         catch (Exception ex)
         {
             Debug.Log(ex.Message);
-            ConnectProblem();
+            BM.ConnectProblem();
         }
     }
 
@@ -363,7 +308,7 @@ public class NetGame : GameManager
         catch (Exception ex)
         {
             Debug.Log(ex.Message);
-            ConnectProblem();
+            BM.ConnectProblem();
         }
     }
 
@@ -395,7 +340,7 @@ public class NetGame : GameManager
         catch (Exception ex)
         {
             Debug.Log(ex.Message);
-            ConnectProblem();
+            BM.ConnectProblem();
         }
     }
 
@@ -428,7 +373,7 @@ public class NetGame : GameManager
             }
             catch (Exception ex)
             {
-                ConnectProblem();
+                BM.ConnectProblem();
                 Debug.Log(ex.Message);
             }
         }
