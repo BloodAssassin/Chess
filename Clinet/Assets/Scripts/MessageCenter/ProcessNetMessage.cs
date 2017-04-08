@@ -8,8 +8,10 @@ public class ProcessNetMessage : MonoBehaviour
 
     //关于账户功能的消息处理中心
     private GameObject AccountManager;
-    //关于联网对战过程中的消息处理中心
-    private GameObject BattleManager;
+    //关于联网对战过程中对游戏流程的消息处理中心
+    private GameObject MatchManager;
+    //关于联网对战过程中对棋子操作的消息处理中心
+    private GameObject NetGame;
 
 
     void Update()
@@ -37,13 +39,14 @@ public class ProcessNetMessage : MonoBehaviour
                     AccountManager.GetComponent<AccountManager>().ProcessingMessage(buffer);
                     break;
                 case 1:
-                    //处理匹配系统和积分系统的相关消息
-                    BattleManager = GameObject.Find("BattleManager");
-                    BattleManager.GetComponent<BattleManager>().ProcessingMessage(buffer);
+                    //处理联网对战中游戏流程的相关消息
+                    MatchManager = GameObject.Find("MatchManager");
+                    MatchManager.GetComponent<MatchManager>().ProcessingMessage(buffer);
                     break;
                 case 2:
-                    //处理联网对战过程中的消息
-
+                    //处理联网对战中棋子操作的相关消息
+                    NetGame = GameObject.Find("ChessBoard");
+                    NetGame.GetComponent<NetGame>().ProcessingMessage(buffer);
                     break;
                 case 9:
                     //当游戏一开始连上网的时候，获取本地联网的IP地址

@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccountManager.cs" />
+    <Compile Include="BattleManager.cs" />
     <Compile Include="mainServer.cs">
       <SubType>Form</SubType>
     </Compile>

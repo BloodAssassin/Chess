@@ -9,35 +9,6 @@ using System.Threading;
 
 public class NetGame : GameManager
 {
-
-    /*********************协议说明***********************/
-    //根据协议解码
-    /*
-     * 1）执红方还是黑方：这个信息由客户端发出，服务器接收
-     *    [ 命令1：棋子颜色(1位) | 持子的颜色(1位) | ...]
-     *    第一个字节固定是1；最后一个字节是1或者0，1表示走红棋，0表示走黑棋
-     *    
-     * 2）点击信息
-     *    [ 命令2：点击信息(1位) | ip(对方的ip 25位) | 移动的棋子id（4位）| 移动到的行数row(4位) | 移动到的列数col(4位) | ...]
-     *    点击的棋子id（有可能是-1）
-     *    注意：两个客户端之间的棋盘是颠倒的，所以传给另一个客户端的row应该是9-row，col是8-col
-     *    注意2：判断点击的棋子是否是自己的棋子，若不是则不能点中（s[id]._red==_beSide）
-     *    
-     * 3)悔棋
-     *    [ 命令3：悔棋(1位) | ip(对方的ip 25位) | ...]
-     *    
-     * 4)初始化棋盘：这个信息由服务器发出，客户端接收
-     *    [ 命令4：初始化棋盘(1位) | ip(自己的ip和对方的ip 50位) | 持子的颜色(1位) | ...] 
-     *    
-     * 5)对手已掉线：这个信息由服务器发出，客户端接收
-     *    [ 命令5：对手掉线(1位) | ...] 
-     *    
-     * 6)心跳检测：这个信息由客户端发出，服务器接收
-     *    [ 命令6：定时检测对手是否掉线(1位) | ip(对方的ip和自己的ip 50位) | ...] 
-     *    
-     */
-
-
     //对手的IP地址
     public static string _rivalIP = "";
     //对手的Email地址
@@ -48,7 +19,7 @@ public class NetGame : GameManager
     //StoneManager脚本
     public StoneManager SM;
     //BattleManager脚本
-    public BattleManager BM;
+    public MatchManager MM;
 
 
     void Start()
@@ -64,13 +35,14 @@ public class NetGame : GameManager
         seletcedChess = Resources.LoadAll("_newSelectChess");
 
         SM = (StoneManager)GameObject.Find("ChessBoard").GetComponent("StoneManager");
-        BM = (BattleManager)GameObject.Find("BattleManager").GetComponent("BattleManager");
+        MM = (MatchManager)GameObject.Find("MatchManager").GetComponent("MatchManager");
     }
 
     void Update()
     {
         base.MainProcess();
     }
+
 
     /// <summary>
     /// 移动棋子，并向对手发送消息
@@ -99,6 +71,7 @@ public class NetGame : GameManager
     {
         if (base._beRedTurn != _beSide)
             return;
+
         BackOne();
         BackOne();
 
@@ -114,7 +87,7 @@ public class NetGame : GameManager
         //告诉服务器自己选择重开，服务器告诉对手玩家已放弃比赛
         Common.connSocket.Close();
         _rivalIP = "";
-        BM._hintMessage.SetActive(false);
+        MM._hintMessage.SetActive(false);
         SceneManager.LoadScene("NetGame");
     }
 
@@ -138,49 +111,45 @@ public class NetGame : GameManager
     /// <summary>
     /// 处理从服务端接收到的消息
     /// </summary>
-    public void ProcessingMessage()
+    public void ProcessingMessage(byte[] data)
     {
-        if (NetworkManager.bufferList.Count != 0)
-        {
-            byte[] buffer = NetworkManager.bufferList[0];
-            //获取口令
-            int command = buffer[0];
+        //获取口令
+        int command = data[1];
 
-            switch (command)
-            {
-                case 2:
-                    ClickFromNetwork(buffer);
-                    break;
-                case 3:
-                    BackFromNetwork();
-                    break;
-                case 4:
-                    //InitFromNetwork(buffer);
-                    break;
-                case 5:
-                    DisconnectFromNetwork();
-                    break;
-                default:
-                    break;
-            }
-            NetworkManager.bufferList.RemoveAt(0);
-        }
+        switch (command)
+        {
+            case 0:
+                ClickFromNetwork(data);
+                break;
+            case 1:
+                BackFromNetwork(data);
+                break;
+            case 2:
+                AgreeBackMessage(data);
+                break;
+            case 3:
+                DisconnectFromNetwork();
+                break;
+            default:
+                break;
+        }          
     }
 
     /// <summary>
     /// 接收对手下棋的消息
     /// </summary>
     /// <param name="buffer"></param>
-    void ClickFromNetwork(byte[] buffer)
+    private void ClickFromNetwork(byte[] buffer)
     {
-        //协议：
-        //[ 命令2：点击信息(1位) | ip(自己的ip 25位) | 移动的棋子id（4位）| 移动到的行数row(4位) | 移动到的列数col(4位) | ...]
+        //[ 命令20 (2位) | ip(自己的ip 25位) | 移动的棋子id（4位）| 移动到的行数row(4位) | 移动到的列数col(4位) | ...]
         byte[] tmpId = new byte[4];
         byte[] tmpRow = new byte[4];
         byte[] tmpCol = new byte[4];
-        Array.Copy(buffer, 26, tmpId, 0, 4);
-        Array.Copy(buffer, 30, tmpRow, 0, 4);
-        Array.Copy(buffer, 34, tmpCol, 0, 4);
+
+        Array.Copy(buffer, 27, tmpId, 0, 4);
+        Array.Copy(buffer, 31, tmpRow, 0, 4);
+        Array.Copy(buffer, 35, tmpCol, 0, 4);
+
         int id = System.BitConverter.ToInt32(tmpId, 0);
         int row = System.BitConverter.ToInt32(tmpRow, 0);
         int col = System.BitConverter.ToInt32(tmpCol, 0);
@@ -191,10 +160,30 @@ public class NetGame : GameManager
     /// <summary>
     /// 接收到对手的悔棋消息
     /// </summary>
-    void BackFromNetwork()
+    private void BackFromNetwork(byte[] data)
     {
-        BackOne();
-        BackOne();
+        //[ 命令21 (2位) | ...]
+        //弹出弹窗，让玩家确认是否同意对方悔棋
+        Debug.Log("对方申请悔棋");
+    }
+
+    /// <summary>
+    /// 接收到对方是否同意悔棋的消息
+    /// </summary>
+    /// <param name="data"></param>
+    private void AgreeBackMessage(byte[] data)
+    {
+        //[ 命令22 (2位) | 是否同意悔棋(1位) | ...] (同意为1，不同意为0)
+        if (data[2] == 1)
+        {
+            BackOne();
+            BackOne();
+        }
+        else if (data[2] == 0)
+        {
+            //提醒玩家对方不同意悔棋的请求
+            Debug.Log("对方不同意悔棋");
+        }
     }
 
     /// <summary>
@@ -207,16 +196,16 @@ public class NetGame : GameManager
         bool beRedSide = isRed;
         SM.StoneInit(beRedSide);
         _beSide = beRedSide;
-        BM._hintMessage.SetActive(false);
+        MM._hintMessage.SetActive(false);
     }
 
     /// <summary>
     /// 接收到对手离线的消息
     /// </summary>
-    void DisconnectFromNetwork()
+    private void DisconnectFromNetwork()
     {
-        BM._hintMessage.SetActive(true);
-        BM._hintMessage.GetComponent<Text>().text = "您的对手已离线...";
+        MM._hintMessage.SetActive(true);
+        MM._hintMessage.GetComponent<Text>().text = "您的对手已离线...";
 
         StartCoroutine(ToolManager.DelayToInvokeDo(() => { Restart(); }, 2f));
     }
@@ -224,50 +213,51 @@ public class NetGame : GameManager
     #endregion
 
 
-    #region 发送消息给服务端，包括选择的棋子颜色、点击信息、悔棋信息、心跳检测
+    #region 发送消息给服务端，包括点击信息、悔棋信息、心跳检测
 
-    /// <summary>
-    /// 告诉服务器自己选的是什么颜色的棋子
-    /// </summary>
-    /// <param name="isRed"></param>
-    void SendColorMessageToServer(bool isRed)
-    {
-        //[ 命令10(2位) | 账户邮箱(20位) | 棋子颜色(1位) | ...]
-        List<byte> list = new List<byte>();
-        list.Insert(0, 1);
-        list.Insert(1, 0);
+    ///// <summary>
+    ///// 告诉服务器自己选的是什么颜色的棋子
+    ///// </summary>
+    ///// <param name="isRed"></param>
+    //void SendColorMessageToServer(bool isRed)
+    //{
+    //    //[ 命令10(2位) | 账户邮箱(20位) | 棋子颜色(1位) | ...]
+    //    List<byte> list = new List<byte>();
+    //    list.Insert(0, 1);
+    //    list.Insert(1, 0);
 
-        byte[] sendEmail = Encoding.UTF8.GetBytes(NetworkManager._myEmail);
-        list.AddRange(sendEmail);
-        //sendEmail 不够20位
-        if (sendEmail.Length < 20)
-        {
-            for (int i = 0; i < 20 - sendEmail.Length; i++)
-            {
-                list.Add(0);
-            }
-        }
+    //    byte[] sendEmail = Encoding.UTF8.GetBytes(NetworkManager._myEmail);
+    //    list.AddRange(sendEmail);
+    //    //sendEmail 不够20位
+    //    if (sendEmail.Length < 20)
+    //    {
+    //        for (int i = 0; i < 20 - sendEmail.Length; i++)
+    //        {
+    //            list.Add(0);
+    //        }
+    //    }
 
-        if (isRed)
-        {
-            list.Insert(22, 1);
-        }
-        else
-        {
-            list.Insert(22, 0);
-        }
+    //    if (isRed)
+    //    {
+    //        list.Insert(22, 1);
+    //    }
+    //    else
+    //    {
+    //        list.Insert(22, 0);
+    //    }
 
-        //开始发送
-        try
-        {
-            Common.connSocket.Send(list.ToArray());
-        }
-        catch (Exception ex)
-        {
-            Debug.Log(ex.Message);
-            BM.ConnectProblem();
-        }
-    }
+    //    //开始发送
+    //    try
+    //    {
+    //        Common.connSocket.Send(list.ToArray());
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Debug.Log(ex.Message);
+    //        MM.ConnectProblem();
+    //    }
+    //}
+
 
     /// <summary>
     /// 告诉服务器自己的点击信息
@@ -275,9 +265,9 @@ public class NetGame : GameManager
     /// <param name="id"></param>
     /// <param name="row"></param>
     /// <param name="col"></param>
-    void SendClickMessageToServer(int id, int row, int col)
+    private void SendClickMessageToServer(int id, int row, int col)
     {
-        //[ 命令2：点击信息(1位) | ip(对方的ip 25位) | 移动的棋子id（4位）| 移动到的行数row(4位) | 移动到的列数col(4位) | ...]
+        //[ 命令20 (2位) | ip(对方的ip 25位) | 移动的棋子id（4位）| 移动到的行数row(4位) | 移动到的列数col(4位) | ...]
 
         //发送给对方
         byte[] sendIp = Encoding.UTF8.GetBytes(_rivalIP.Trim('\0'));
@@ -286,7 +276,10 @@ public class NetGame : GameManager
         byte[] sendCol = System.BitConverter.GetBytes(col);
 
         List<byte> list = new List<byte>();
+
         list.Insert(0, 2);
+        list.Insert(1, 0);
+
         list.AddRange(sendIp);
         //sendIp 不够25位
         if (sendIp.Length < 25)
@@ -296,6 +289,7 @@ public class NetGame : GameManager
                 list.Add(0);
             }
         }
+
         list.AddRange(sendId);
         list.AddRange(sendRow);
         list.AddRange(sendCol);
@@ -308,20 +302,23 @@ public class NetGame : GameManager
         catch (Exception ex)
         {
             Debug.Log(ex.Message);
-            BM.ConnectProblem();
+            MM.ConnectProblem();
         }
     }
 
     /// <summary>
-    /// 告诉服务器自己悔棋了
+    /// 告诉服务器自己申请悔棋
     /// </summary>
-    void SendBackMessageToServer()
+    private void SendBackMessageToServer()
     {
-        //[ 命令3：悔棋(1位) | ip(对方的ip 25位) | ...]
+        //[ 命令21 (2位) | ip(对方的ip 25位) | ...]
         byte[] sendIp = Encoding.UTF8.GetBytes(_rivalIP.Trim('\0'));
 
         List<byte> list = new List<byte>();
-        list.Insert(0, 3);
+
+        list.Insert(0, 2);
+        list.Insert(1, 1);
+
         list.AddRange(sendIp);
         //sendIp 不够25位
         if (sendIp.Length < 25)
@@ -340,27 +337,76 @@ public class NetGame : GameManager
         catch (Exception ex)
         {
             Debug.Log(ex.Message);
-            BM.ConnectProblem();
+            MM.ConnectProblem();
         }
     }
 
     /// <summary>
+    /// 告诉服务器是否同意悔棋
+    /// </summary>
+    /// <param name="isAgree"></param>
+    private void SendAgreeBackMessageToServer(bool isAgree)
+    {
+        //[ 命令22 (2位) | ip(对方的ip 25位) | 是否同意悔棋(1位) | ...](同意为1，不同意为0)
+        byte[] sendIp = Encoding.UTF8.GetBytes(_rivalIP.Trim('\0'));
+
+        List<byte> list = new List<byte>();
+
+        list.Insert(0, 2);
+        list.Insert(1, 2);
+
+        list.AddRange(sendIp);
+        //sendIp 不够25位
+        if (sendIp.Length < 25)
+        {
+            for (int i = 0; i < 25 - sendIp.Length; i++)
+            {
+                list.Add(0);
+            }
+        }
+
+        if (isAgree)
+        {
+            list.Insert(27, 1);
+        }
+        else
+        {
+            list.Insert(27, 0);
+        }
+
+        //开始发送
+        try
+        {
+            Common.connSocket.Send(list.ToArray());
+        }
+        catch (Exception ex)
+        {
+            Debug.Log(ex.Message);
+            MM.ConnectProblem();
+        }
+    }  
+
+    /// <summary>
     /// 告诉服务器，需要获取对手是否在线的消息
     /// </summary>
-    void SendCheckMessageToServer()
+    private void SendCheckMessageToServer()
     {
+        //[ 命令23 (2位) | ip(对方的ip 25位) | ...] 
+
         if (Common.connSocket != null && NetworkManager._myIP != "" && _rivalIP != "")
         {
-            //[ 命令6：定时检测对手是否掉线(1位) | ip(对方的ip和自己的ip 50位) | ...] 
-            string allIp = string.Format("{0},{1}", _rivalIP.Trim('\0'), NetworkManager._myIP.Trim('\0'));
-            byte[] sendIp = Encoding.UTF8.GetBytes(allIp);
+            byte[] sendIp = Encoding.UTF8.GetBytes(_rivalIP.Trim('\0'));
+
             List<byte> list = new List<byte>();
-            list.Insert(0, 6);
+
+            list.Insert(0, 2);
+            list.Insert(1, 3);
+
             list.AddRange(sendIp);
-            //sendIp 不够50位
-            if (sendIp.Length < 50)
+            //sendIp 不够25位
+            if (sendIp.Length < 25)
             {
-                for (int i = 0; i < 50 - sendIp.Length; i++)
+                for (int i = 0; i < 25 - sendIp.Length; i++)
                 {
                     list.Add(0);
                 }
@@ -373,7 +419,7 @@ public class NetGame : GameManager
             }
             catch (Exception ex)
             {
-                BM.ConnectProblem();
+                MM.ConnectProblem();
                 Debug.Log(ex.Message);
             }
         }
