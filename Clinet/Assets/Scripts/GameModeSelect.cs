@@ -4,6 +4,11 @@ using UnityEngine.SceneManagement;
 
 public class GameModeSelect : MonoBehaviour {
 
+    public GameObject ErrorPanel;
+
+    public GameObject NetworkUnavailable;
+    public GameObject PassbyMode;
+
     public void OnePersonModeButton()
     {
         SceneManager.LoadScene("SingleGame");
@@ -16,7 +21,19 @@ public class GameModeSelect : MonoBehaviour {
 
     public void NetBattleModeButton()
     {
-        SceneManager.LoadScene("NetGame");
+        if (NetworkManager.isPassby)
+        {
+            ErrorPanel.SetActive(true);
+            PassbyMode.SetActive(true);
+        }
+        else if(!NetworkManager.isConnected)
+        {
+            GameObject.Find("NetworkManager").GetComponent<NetworkManager>().ConnectServer();
+        }
+        else
+        {
+            SceneManager.LoadScene("NetGame");
+        }
     }
 
     public void TeachingModeButton()
@@ -28,4 +45,15 @@ public class GameModeSelect : MonoBehaviour {
     {
         Application.Quit();  
     }
+
+    /// <summary>
+    /// 将提示错误的panel设置为不可见
+    /// </summary>
+    public void btn_SetErrorPanelDisable()
+    {
+        ErrorPanel.SetActive(false);
+        NetworkUnavailable.SetActive(false);
+        PassbyMode.SetActive(false);
+    }
+
 }

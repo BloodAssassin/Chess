@@ -64,9 +64,10 @@ public class MatchManager : MonoBehaviour
     private void MatchRivalMessage(byte[] data)
     {
         //[ 命令10(2位) | 对方的ip (25位) | 对方的邮箱(20位) | 棋子颜色(1位) | ...]
-        NetGame._rivalIP = Encoding.UTF8.GetString(data, 2, 25);
-        NetGame._rivalEmail = Encoding.UTF8.GetString(data, 27, 20);
+        NetGame._rivalIP = Encoding.UTF8.GetString(data, 2, 25).Trim('\0');
+        NetGame._rivalEmail = Encoding.UTF8.GetString(data, 27, 20).Trim('\0');
 
+        Debug.Log("对方的IP为：" + NetGame._rivalIP);
         Debug.Log("对方的Email为：" + NetGame._rivalEmail);
         Debug.Log("我方的Email为：" + NetworkManager._myEmail);
 
@@ -91,26 +92,39 @@ public class MatchManager : MonoBehaviour
     /// </summary>
     public void RedButton()
     {
-        //将选择红棋的消息发送给服务器
-        SendColorMessageToServer(true);
+        if (NetworkManager.isConnected)
+        {
+            //将选择红棋的消息发送给服务器
+            SendColorMessageToServer(true);
 
-        _selectColorPlane.SetActive(false);
-        _hintMessage.SetActive(true);
-        _hintMessage.GetComponent<Text>().text = "正在匹配对手，请耐心等待...";
+            _selectColorPlane.SetActive(false);
+            _hintMessage.SetActive(true);
+            _hintMessage.GetComponent<Text>().text = "正在匹配对手，请耐心等待...";
+        }
+        else
+        {
+            GameObject.Find("NetworkManager").GetComponent<NetworkManager>().ConnectServer();
+        }
     }
-
 
     /// <summary>
     /// 选择黑棋
     /// </summary>
     public void BlackButton()
     {
-        //将选择黑棋的消息发送给服务器
-        SendColorMessageToServer(false);
+        if (NetworkManager.isConnected)
+        {
+            //将选择黑棋的消息发送给服务器
+            SendColorMessageToServer(false);
 
-        _selectColorPlane.SetActive(false);
-        _hintMessage.SetActive(true);
-        _hintMessage.GetComponent<Text>().text = "正在匹配对手，请耐心等待...";
+            _selectColorPlane.SetActive(false);
+            _hintMessage.SetActive(true);
+            _hintMessage.GetComponent<Text>().text = "正在匹配对手，请耐心等待...";
+        }
+        else
+        {
+            GameObject.Find("NetworkManager").GetComponent<NetworkManager>().ConnectServer();
+        }
     }
 
     #endregion
@@ -135,6 +149,7 @@ public class MatchManager : MonoBehaviour
     }
 
     #endregion
+
 
     /// <summary>
     /// 将选择的颜色以及自身的Email地址打包

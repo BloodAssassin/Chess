@@ -16,9 +16,16 @@ public class NetGame : GameManager
 
     public float lastTime;
 
+    public GameObject RetractButtonPanel;
+    public GameObject RetractMessagePanel;
+    public GameObject AgreeRetractMessage;
+    public GameObject DisgreeRetractMessage;
+    public GameObject WaitingMessage;
+
+
     //StoneManager脚本
     public StoneManager SM;
-    //BattleManager脚本
+    //MatchManager脚本
     public MatchManager MM;
 
 
@@ -72,8 +79,8 @@ public class NetGame : GameManager
         if (base._beRedTurn != _beSide)
             return;
 
-        BackOne();
-        BackOne();
+        RetractMessagePanel.SetActive(true);
+        WaitingMessage.SetActive(true);
 
         //将悔棋消息发送给服务器
         SendBackMessageToServer();
@@ -102,6 +109,37 @@ public class NetGame : GameManager
         SceneManager.LoadScene("Menu");
     }
 
+    /// <summary>
+    /// 将对方是否悔棋的panel隐藏
+    /// </summary>
+    public void SetRetractMessagePanelDisable()
+    {
+        RetractMessagePanel.SetActive(false);
+        AgreeRetractMessage.SetActive(false);
+        DisgreeRetractMessage.SetActive(false);
+        WaitingMessage.SetActive(false);
+    }
+
+    /// <summary>
+    /// 同意悔棋
+    /// </summary>
+    public void AgreeRetract()
+    {
+        SendAgreeBackMessageToServer(true);
+        RetractButtonPanel.SetActive(false);
+
+        BackOne();
+        BackOne();
+    }
+
+    /// <summary>
+    /// 不同意悔棋
+    /// </summary>
+    public void DisagreeRetract()
+    {
+        SendAgreeBackMessageToServer(false);
+        RetractButtonPanel.SetActive(false);
+    }
 
     #endregion
 
@@ -162,8 +200,8 @@ public class NetGame : GameManager
     /// </summary>
     private void BackFromNetwork(byte[] data)
     {
-        //[ 命令21 (2位) | ...]
         //弹出弹窗，让玩家确认是否同意对方悔棋
+        RetractButtonPanel.SetActive(true);
         Debug.Log("对方申请悔棋");
     }
 
@@ -176,12 +214,17 @@ public class NetGame : GameManager
         //[ 命令22 (2位) | 是否同意悔棋(1位) | ...] (同意为1，不同意为0)
         if (data[2] == 1)
         {
+            WaitingMessage.SetActive(false);
+            AgreeRetractMessage.SetActive(true);
+           
             BackOne();
             BackOne();
         }
         else if (data[2] == 0)
         {
             //提醒玩家对方不同意悔棋的请求
+            WaitingMessage.SetActive(false);
+            DisgreeRetractMessage.SetActive(true);
             Debug.Log("对方不同意悔棋");
         }
     }
@@ -214,50 +257,6 @@ public class NetGame : GameManager
 
 
     #region 发送消息给服务端，包括点击信息、悔棋信息、心跳检测
-
-    ///// <summary>
-    ///// 告诉服务器自己选的是什么颜色的棋子
-    ///// </summary>
-    ///// <param name="isRed"></param>
-    //void SendColorMessageToServer(bool isRed)
-    //{
-    //    //[ 命令10(2位) | 账户邮箱(20位) | 棋子颜色(1位) | ...]
-    //    List<byte> list = new List<byte>();
-    //    list.Insert(0, 1);
-    //    list.Insert(1, 0);
-
-    //    byte[] sendEmail = Encoding.UTF8.GetBytes(NetworkManager._myEmail);
-    //    list.AddRange(sendEmail);
-    //    //sendEmail 不够20位
-    //    if (sendEmail.Length < 20)
-    //    {
-    //        for (int i = 0; i < 20 - sendEmail.Length; i++)
-    //        {
-    //            list.Add(0);
-    //        }
-    //    }
-
-    //    if (isRed)
-    //    {
-    //        list.Insert(22, 1);
-    //    }
-    //    else
-    //    {
-    //        list.Insert(22, 0);
-    //    }
-
-    //    //开始发送
-    //    try
-    //    {
-    //        Common.connSocket.Send(list.ToArray());
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Debug.Log(ex.Message);
-    //        MM.ConnectProblem();
-    //    }
-    //}
-
 
     /// <summary>
     /// 告诉服务器自己的点击信息

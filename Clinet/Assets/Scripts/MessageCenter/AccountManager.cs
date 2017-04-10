@@ -9,6 +9,9 @@ using System.Text.RegularExpressions;
 
 public class AccountManager : MonoBehaviour
 {
+
+    public GameObject _networkManager;
+
     //各个panel界面
     public GameObject LoginPanel;
     public GameObject RegisterPanel1;
@@ -17,6 +20,7 @@ public class AccountManager : MonoBehaviour
     public GameObject FindPasswordPanel1;
     public GameObject FindPasswordPanel2;
     public GameObject FindPasswordPanel3;
+    public GameObject ErrorPanel;
 
     //LoginPanel上的各种控件
     public GameObject IF_LoginEmail;
@@ -37,6 +41,26 @@ public class AccountManager : MonoBehaviour
     public GameObject IF_FindPasswordPassword1;
     public GameObject IF_FindPasswordPassword2;
 
+    //ErrorPanel
+    //登陆时账号或密码错误
+    public GameObject LoginWrongful;
+
+    //注册时输入的昵称或密码不合法
+    public GameObject NameOrPasswordWrongful;
+    //注册时输入的邮箱不合法
+    public GameObject EmailWrongful;
+
+    //找回密码时邮箱不存在
+    public GameObject EmailNonexistent;
+    //找回密码时验证码错误
+    public GameObject CodeWrongful;
+    //找回密码时新设置的密码不合法
+    public GameObject NewPasswordWrongful;
+    //找回密码时两次输入的密码不一致
+    public GameObject PasswordsNotSame;
+
+    //打开游戏时提示网络不可用
+    public GameObject NetworkUnavailable;
 
     public string registerName = "";
     public string registerPassword = "";
@@ -91,6 +115,7 @@ public class AccountManager : MonoBehaviour
         if (data[2] == 0)
         {
             Debug.Log("注册成功");
+            IF_RegisterEmaill.GetComponent<InputField>().text = "";
             RegisterPanel3.SetActive(true);
         }
         else if (data[2] == 1)
@@ -117,6 +142,9 @@ public class AccountManager : MonoBehaviour
             NetworkManager._myEmail = myEmail.Length > 0 ? myEmail.Trim('\0') : "";
             Debug.Log("本地的Email为：" + NetworkManager._myEmail);
 
+            IF_LoginEmail.GetComponent<InputField>().text = "";
+            IF_LoginPassword.GetComponent<InputField>().text = "";
+
             //跳转到游戏主界面
             SceneManager.LoadScene("Menu");
         }
@@ -124,7 +152,10 @@ public class AccountManager : MonoBehaviour
         {
             Debug.Log("登陆失败");
             //弹出消息窗，告知用户登录失败
-            //在弹出窗中点击确认键，回到登录界面
+            ErrorPanel.SetActive(true);
+            LoginWrongful.SetActive(true);
+
+            IF_LoginPassword.GetComponent<InputField>().text = "";
         }
     }
 
@@ -143,6 +174,8 @@ public class AccountManager : MonoBehaviour
         else if (data[2] == 1)
         {
             Debug.Log("要找回密码的邮箱不存在");
+            ErrorPanel.SetActive(true);
+            EmailNonexistent.SetActive(true);
         }
     }
 
@@ -155,11 +188,15 @@ public class AccountManager : MonoBehaviour
         if (data[2] == 0)
         {
             Debug.Log("验证码正确");
+            IF_FindPasswordCode.GetComponent<InputField>().text = "";
             FindPasswordPanel2.SetActive(true);
         }
         else if (data[2] == 1)
         {
             Debug.Log("验证码错误");
+            IF_FindPasswordCode.GetComponent<InputField>().text = "";
+            ErrorPanel.SetActive(true);
+            CodeWrongful.SetActive(true);
         }
     }
 
@@ -172,6 +209,8 @@ public class AccountManager : MonoBehaviour
         if (data[2] == 0)
         {
             FindPasswordPanel3.SetActive(true);
+            IF_FindPasswordPassword1.GetComponent<InputField>().text = "";
+            IF_FindPasswordPassword2.GetComponent<InputField>().text = "";
         }
         else if (data[2] == 1)
         {
@@ -306,13 +345,15 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     public void btn_SwitchToRegister()
     {
-        //LoginPanel.SetActive(false);
-        RegisterPanel1.SetActive(true);
-        //RegisterPanel2.SetActive(false);
-        //RegisterPanel3.SetActive(false);
-        //FindPasswordPanel1.SetActive(false);
-        //FindPasswordPanel2.SetActive(false);
-        //FindPasswordPanel3.SetActive(false);
+        if (NetworkManager.isConnected)
+        {
+            RegisterPanel1.SetActive(true);
+            Debug.Log(NetworkManager.isConnected);
+        }
+        else
+        {
+            _networkManager.GetComponent<NetworkManager>().ConnectServer();
+        }
     }
 
     /// <summary>
@@ -334,36 +375,46 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     public void btn_SwitchToFindPassword()
     {
-        //LoginPanel.SetActive(false);
-        FindPasswordPanel1.SetActive(true);
+        if (NetworkManager.isConnected)
+        {
+            FindPasswordPanel1.SetActive(true);
+        }
+        else
+        {
+            _networkManager.GetComponent<NetworkManager>().ConnectServer();
+        }
     }
-
 
     /// <summary>
     /// 注册账号(注册界面1)
     /// </summary>
     public void btn_RegisterAccount1()
     {
-        registerName = IF_RegisterName.GetComponent<InputField>().text;
-        registerPassword = IF_RegisterPassword.GetComponent<InputField>().text;
+        if (NetworkManager.isConnected)
+        {
+            registerName = IF_RegisterName.GetComponent<InputField>().text;
+            registerPassword = IF_RegisterPassword.GetComponent<InputField>().text;
 
-        //检测输入的昵称和密码是否合法
-        if (NameIsRight(registerName) && PasswordIsRight(registerPassword))
-        {
-            //跳转到下一个界面
-            RegisterPanel2.SetActive(true);
+            //检测输入的昵称和密码是否合法
+            if (NameIsRight(registerName) && PasswordIsRight(registerPassword))
+            {
+                IF_RegisterName.GetComponent<InputField>().text = "";
+                IF_RegisterPassword.GetComponent<InputField>().text = "";
+                //跳转到下一个界面
+                RegisterPanel2.SetActive(true);
+            }
+            else if (!NameIsRight(registerName) || !PasswordIsRight(registerPassword))
+            {
+                //弹出窗口提示错误
+                ErrorPanel.SetActive(true);
+                NameOrPasswordWrongful.SetActive(true);
+                Debug.Log("昵称过长或密码过长");
+            }
         }
-        else if(!NameIsRight(registerName))
+        else
         {
-            //弹出窗口提示错误
-            Debug.Log("昵称过长");
-        }
-        else if (!PasswordIsRight(registerPassword))
-        {
-            //弹出窗口提示错误
-            Debug.Log("密码过长");
-        }
-        
+            _networkManager.GetComponent<NetworkManager>().ConnectServer();
+        }     
     }
 
     /// <summary>
@@ -371,18 +422,26 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     public void btn_RegisterAccount2()
     {
-        registerEmail = IF_RegisterEmaill.GetComponent<InputField>().text;
-
-        //检测输入的邮箱是否有问题
-        if (EmailIsRight(registerEmail))
+        if (NetworkManager.isConnected)
         {
-            SendRegisterMessageToServer(registerEmail, registerName, registerPassword);
+            registerEmail = IF_RegisterEmaill.GetComponent<InputField>().text;
+
+            //检测输入的邮箱是否有问题
+            if (EmailIsRight(registerEmail))
+            {
+                SendRegisterMessageToServer(registerEmail, registerName, registerPassword);
+            }
+            else
+            {
+                ErrorPanel.SetActive(true);
+                EmailWrongful.SetActive(true);
+                Debug.Log("输入的邮箱不合法");
+            }
         }
         else
         {
-            Debug.Log("输入的邮箱不合法");
-        }
-        
+            _networkManager.GetComponent<NetworkManager>().ConnectServer();
+        }       
     }
 
 
@@ -391,10 +450,17 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     public void btn_LoginAccount()
     {
-        string email = IF_LoginEmail.GetComponent<InputField>().text;
-        string password = IF_LoginPassword.GetComponent<InputField>().text;
+        if (NetworkManager.isConnected)
+        {
+            string email = IF_LoginEmail.GetComponent<InputField>().text;
+            string password = IF_LoginPassword.GetComponent<InputField>().text;
 
-        SendLoginMessageToServer(email, password);
+            SendLoginMessageToServer(email, password);
+        }
+        else
+        {
+            _networkManager.GetComponent<NetworkManager>().ConnectServer();
+        }
     }
 
 
@@ -403,11 +469,18 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     public void btn_FindPassword()
     {
-        //获取邮箱地址
-        findPasswordEmail = IF_FindPasswordEmaill.GetComponent<InputField>().text;
+        if (NetworkManager.isConnected)
+        {
+            //获取邮箱地址
+            findPasswordEmail = IF_FindPasswordEmaill.GetComponent<InputField>().text;
 
-        //发送获取验证码的请求给服务器
-        SendFindPasswordMessageToServer(findPasswordEmail);
+            //发送获取验证码的请求给服务器
+            SendFindPasswordMessageToServer(findPasswordEmail); ;
+        }
+        else
+        {
+            _networkManager.GetComponent<NetworkManager>().ConnectServer();
+        }
     }
 
     /// <summary>
@@ -415,13 +488,20 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     public void btn_SendIdentifyingCode()
     {
-        //获取验证码
-        string code = IF_FindPasswordCode.GetComponent<InputField>().text;
+        if (NetworkManager.isConnected)
+        {
+            //获取验证码
+            string code = IF_FindPasswordCode.GetComponent<InputField>().text;
 
-        Debug.Log("发送的验证码为："+code);
+            Debug.Log("发送的验证码为：" + code);
 
-        //发送验证码给服务器
-        SendIdentifyingCodeMessageToServer(findPasswordEmail, code);
+            //发送验证码给服务器
+            SendIdentifyingCodeMessageToServer(findPasswordEmail, code);
+        }
+        else
+        {
+            _networkManager.GetComponent<NetworkManager>().ConnectServer();
+        }
     }
 
     /// <summary>
@@ -429,26 +509,65 @@ public class AccountManager : MonoBehaviour
     /// </summary>
     public void btn_ResetPassword()
     {
-        //获取两次输入的密码
-        string password1 = IF_FindPasswordPassword1.GetComponent<InputField>().text;
-        string password2 = IF_FindPasswordPassword2.GetComponent<InputField>().text;
+        if (NetworkManager.isConnected)
+        {
+            //获取两次输入的密码
+            string password1 = IF_FindPasswordPassword1.GetComponent<InputField>().text;
+            string password2 = IF_FindPasswordPassword2.GetComponent<InputField>().text;
 
-        //验证密码格式
-        if (!PasswordIsRight(password1)||!PasswordIsRight(password2))
-        {
-            Debug.Log("输入的密码不合法");
-        }
-        else if (password1 != password2)
-        {
-            Debug.Log("两次输入的密码不一致");
+            //验证密码格式
+            if (!PasswordIsRight(password1) || !PasswordIsRight(password2))
+            {
+                ErrorPanel.SetActive(true);
+                NewPasswordWrongful.SetActive(true);
+                Debug.Log("输入的密码不合法");
+            }
+            else if (password1 != password2)
+            {
+                ErrorPanel.SetActive(true);
+                PasswordsNotSame.SetActive(true);
+                Debug.Log("两次输入的密码不一致");
+            }
+            else
+            {
+                //发送新密码给服务器
+                SendResetPasswordMessageToServer(findPasswordEmail, password1);
+            }       
         }
         else
         {
-            //发送新密码给服务器
-            SendResetPasswordMessageToServer(findPasswordEmail,password1);
-        }       
+            _networkManager.GetComponent<NetworkManager>().ConnectServer();
+        }      
     }
 
+    /// <summary>
+    /// 将提示错误的panel设置为不可见
+    /// </summary>
+    public void btn_SetErrorPanelDisable()
+    {
+        ErrorPanel.SetActive(false);
+        LoginWrongful.SetActive(false);
+
+        NameOrPasswordWrongful.SetActive(false);
+        EmailWrongful.SetActive(false);
+
+        EmailNonexistent.SetActive(false);
+        CodeWrongful.SetActive(false);
+        NewPasswordWrongful.SetActive(false);
+
+        PasswordsNotSame.SetActive(false);
+
+        NetworkUnavailable.SetActive(false);
+    }
+
+    /// <summary>
+    /// 游客登录
+    /// </summary>
+    public void btn_LoginByPassby()
+    {
+        NetworkManager.isPassby = true;
+        SceneManager.LoadScene("Menu");
+    }
 
     #endregion
 

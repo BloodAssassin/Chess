@@ -12,11 +12,13 @@ public class NetworkManager : MonoBehaviour
 {
     public static NetworkManager Instance { set; get; }
 
+    private GameObject AccountManager;
+
     /// <summary>
     /// 连接服务器的ip
     /// </summary>
-    //public static string _ip = "115.159.207.34"; //连接云服务器
-    public static string _ip = "127.0.0.1"; //连接本地
+    public static string _ip = "115.159.207.34"; //连接云服务器
+    //public static string _ip = "127.0.0.1"; //连接本地
 
     /// <summary>
     /// 连接服务器的端口
@@ -41,7 +43,17 @@ public class NetworkManager : MonoBehaviour
     /// <summary>
     /// 判断客户端是否连接着服务器
     /// </summary>
-    public bool isConnected = false;
+    public static bool isConnected = false;
+
+    /// <summary>
+    /// 判断客户端是否尝试重新连接服务器
+    /// </summary>
+    public static bool isPassby = false;
+
+    private void Awake()
+    {
+        AccountManager = GameObject.Find("AccountManager");       
+    }
 
     private void Start()
     {
@@ -59,12 +71,23 @@ public class NetworkManager : MonoBehaviour
 
     private void Update()
     {
-        //检测是否连接着服务器，如没有连接服务器则显示连接错误，并且自动重连
-        if (!isConnected)
-        {
-            ConnectProblem();
-            ConnectServer();
-        }
+        ////检测是否连接着服务器，如没有连接服务器则显示连接错误，并且自动重连
+        //if (!isConnected)
+        //{
+        //    ConnectProblem();
+
+        //    //检测是否开始尝试重新连接
+        //    if(!isReconnected)
+        //    {
+        //        //提示当前网络不可用
+        //        AccountManager.GetComponent<AccountManager>().ErrorPanel.SetActive(true);
+        //        AccountManager.GetComponent<AccountManager>().NetworkUnavailable.SetActive(true);
+            
+        //        isReconnected = true;
+        //        //每隔2S，尝试重新连接
+        //        InvokeRepeating("ConnectServer", 0.0f, 3);
+        //    }
+        //}
     }
 
     void OnApplicationQuit()
@@ -76,7 +99,7 @@ public class NetworkManager : MonoBehaviour
     /// <summary>
     /// 连接服务器
     /// </summary>
-    void ConnectServer()
+    public void ConnectServer()
     {
         try
         {
@@ -85,6 +108,7 @@ public class NetworkManager : MonoBehaviour
             IPEndPoint point = new IPEndPoint(address, _point);
             Common.connSocket.Connect(point);
             isConnected = true;
+            //isReconnected = false;
 
             //连接成功，获取服务器发来的消息
             Common.connSocket.BeginReceive(Common.buffer, 0, Common.buffer.Length, 0, new AsyncCallback(Receive), Common.connSocket);
@@ -92,6 +116,7 @@ public class NetworkManager : MonoBehaviour
         catch (Exception ex)
         {
             isConnected = false;
+            ConnectProblem();
             Debug.Log(ex.Message);
         }
     }
@@ -132,19 +157,30 @@ public class NetworkManager : MonoBehaviour
     public void ConnectProblem()
     {
         //Application.loadedLevelName == "NetGame"
-        if (SceneManager.GetActiveScene().name == "NetGame")
-        {
-            GameObject Canvas = GameObject.Find("Canvas");
-            GameObject ReturnToMenuButton = Canvas.transform.Find("ReturnToMenuButton").gameObject;
-            GameObject HintMessage = Canvas.transform.Find("HintMessage").gameObject;
-            GameObject SelectColorPanel = Canvas.transform.Find("SelectColorPanel").gameObject;
+        //if (SceneManager.GetActiveScene().name == "NetGame")
+        //{
+        //    GameObject Canvas = GameObject.Find("Canvas");
+        //    GameObject ReturnToMenuButton = Canvas.transform.Find("ReturnToMenuButton").gameObject;
+        //    GameObject HintMessage = Canvas.transform.Find("HintMessage").gameObject;
+        //    GameObject SelectColorPanel = Canvas.transform.Find("SelectColorPanel").gameObject;
 
-            HintMessage.SetActive(true);
-            SelectColorPanel.SetActive(false);
-            ReturnToMenuButton.SetActive(true);
-            HintMessage.GetComponent<Text>().text = "联网暂时不可用\n点击屏幕任意位置退回菜单";
+        //    HintMessage.SetActive(true);
+        //    SelectColorPanel.SetActive(false);
+        //    ReturnToMenuButton.SetActive(true);
+        //    HintMessage.GetComponent<Text>().text = "联网暂时不可用\n点击屏幕任意位置退回菜单";
+        //}
+        if(SceneManager.GetActiveScene().name == "Login")
+        {         
+            AccountManager.GetComponent<AccountManager>().ErrorPanel.SetActive(true);
+            AccountManager.GetComponent<AccountManager>().NetworkUnavailable.SetActive(true);
+        }
+        else if(SceneManager.GetActiveScene().name == "Menu")
+        {
+            GameObject.Find("Main Camera").GetComponent<GameModeSelect>().ErrorPanel.SetActive(true);
+            GameObject.Find("Main Camera").GetComponent<GameModeSelect>().NetworkUnavailable.SetActive(true);
         }
     }
+
 }
 
 /// <summary>
