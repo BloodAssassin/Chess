@@ -164,7 +164,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// 判断胜负
     /// </summary>
-    void JudgeVictory()
+    public virtual void JudgeVictory()
     {
         //如果是执红棋
         if (_beSide)

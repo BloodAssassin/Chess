@@ -29,6 +29,10 @@ public class GameModeSelect : MonoBehaviour {
         else if(!NetworkManager.isConnected)
         {
             GameObject.Find("NetworkManager").GetComponent<NetworkManager>().ConnectServer();
+            if (NetworkManager.isConnected)
+            {
+                SceneManager.LoadScene("NetGame");
+            }
         }
         else
         {

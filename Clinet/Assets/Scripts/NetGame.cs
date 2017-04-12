@@ -68,6 +68,34 @@ public class NetGame : GameManager
         SendClickMessageToServer(id, row, col);
     }
 
+    /// <summary>
+    /// 判断游戏结果，并将游戏结果发送给服务器
+    /// </summary>
+    public override void JudgeVictory()
+    {      
+        //如果是执红棋
+        if (_beSide)
+        {
+            //黑色的将死了，则获胜；红色的将死了，则失败
+            if (StoneManager.s[20]._dead == true)
+            {
+                //获胜
+                SendResultToServer();
+            }
+        }
+        //如果是执黑棋，则与红棋相反
+        else
+        {
+            if (StoneManager.s[4]._dead == true)
+            {
+                //获胜
+                SendResultToServer();
+            }
+        }
+
+        base.JudgeVictory();
+    }
+
 
     #region 按钮点击事件
 
@@ -249,6 +277,7 @@ public class NetGame : GameManager
     {
         MM._hintMessage.SetActive(true);
         MM._hintMessage.GetComponent<Text>().text = "您的对手已离线...";
+        SendRivalExitToServer();
 
         StartCoroutine(ToolManager.DelayToInvokeDo(() => { Restart(); }, 2f));
     }
@@ -256,7 +285,7 @@ public class NetGame : GameManager
     #endregion
 
 
-    #region 发送消息给服务端，包括点击信息、悔棋信息、心跳检测
+    #region 发送消息给服务端，包括点击信息、悔棋信息、心跳检测、游戏结果
 
     /// <summary>
     /// 告诉服务器自己的点击信息
@@ -391,7 +420,6 @@ public class NetGame : GameManager
     private void SendCheckMessageToServer()
     {
         //[ 命令23 (2位) | ip(对方的ip 25位) | ...] 
-
         if (Common.connSocket != null && NetworkManager._myIP != "" && _rivalIP != "")
         {
             byte[] sendIp = Encoding.UTF8.GetBytes(_rivalIP.Trim('\0'));
@@ -421,6 +449,98 @@ public class NetGame : GameManager
                 MM.ConnectProblem();
                 Debug.Log(ex.Message);
             }
+        }
+    }
+
+    /// <summary>
+    /// 将游戏的结果发送给服务器
+    /// </summary>
+    private void SendResultToServer()
+    {
+        //[ 命令11(2位) | 胜利方的账户邮箱(20位) | 失败方的账户邮箱(20位) | ...]
+        byte[] sendMyEmail = Encoding.UTF8.GetBytes(NetworkManager._myEmail);
+        byte[] sendRivalEmail = Encoding.UTF8.GetBytes(_rivalEmail);
+
+        List<byte> list = new List<byte>();
+
+        list.Insert(0, 1);
+        list.Insert(1, 1);
+
+        list.AddRange(sendMyEmail);
+        //sendMyEmail 不够20位
+        if (sendMyEmail.Length < 20)
+        {
+            for (int i = 0; i < 20 - sendMyEmail.Length; i++)
+            {
+                list.Add(0);
+            }
+        }
+
+        list.AddRange(sendRivalEmail);
+        //sendRivalEmail 不够20位
+        if (sendRivalEmail.Length < 20)
+        {
+            for (int i = 0; i < 20 - sendRivalEmail.Length; i++)
+            {
+                list.Add(0);
+            }
+        }
+
+        //开始发送
+        try
+        {
+            Common.connSocket.Send(list.ToArray());
+        }
+        catch (Exception ex)
+        {
+            Debug.Log(ex.Message);
+            MM.ConnectProblem();
+        }
+    }
+
+    /// <summary>
+    /// 将对手离线的消息告诉服务器
+    /// </summary>
+    private void SendRivalExitToServer()
+    {
+        //[ 命令12(2位) | 我方账户邮箱(20位) | 对手账户邮箱(20位) | ...]
+        byte[] sendMyEmail = Encoding.UTF8.GetBytes(NetworkManager._myEmail);
+        byte[] sendRivalEmail = Encoding.UTF8.GetBytes(_rivalEmail);
+
+        List<byte> list = new List<byte>();
+
+        list.Insert(0, 1);
+        list.Insert(1, 2);
+
+        list.AddRange(sendMyEmail);
+        //sendMyEmail 不够20位
+        if (sendMyEmail.Length < 20)
+        {
+            for (int i = 0; i < 20 - sendMyEmail.Length; i++)
+            {
+                list.Add(0);
+            }
+        }
+
+        list.AddRange(sendRivalEmail);
+        //sendRivalEmail 不够20位
+        if (sendRivalEmail.Length < 20)
+        {
+            for (int i = 0; i < 20 - sendRivalEmail.Length; i++)
+            {
+                list.Add(0);
+            }
+        }
+
+        //开始发送
+        try
+        {
+            Common.connSocket.Send(list.ToArray());
+        }
+        catch (Exception ex)
+        {
+            Debug.Log(ex.Message);
+            MM.ConnectProblem();
         }
     }
 
