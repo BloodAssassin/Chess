@@ -1,18 +1,39 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(AudioSource))]
 public class Test : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () 
+    public MovieTexture movie;
+    private AudioSource audio;
+
+    void Start()
     {
-       
-	}
-	
-	// Update is called once per frame
-	void Update ()
+        GetComponent<RawImage>().texture = movie as MovieTexture;
+        audio = GetComponent<AudioSource>();
+        audio.clip = movie.audioClip;
+
+        movie.Play();
+        audio.Play();
+    }
+
+    void Update()
     {
-       // Debug.Log(GameManager.steps);
-	}
+        if (Input.GetKeyDown(KeyCode.Space) && movie.isPlaying)
+        {
+            movie.Pause();
+        }
+        else if (Input.GetKeyDown(KeyCode.Space) && !movie.isPlaying)
+        {
+            movie.Play();
+        }
+        else if (!movie.isPlaying)
+        {
+            SceneManager.LoadScene("Main");
+        }
+    }
+
 }

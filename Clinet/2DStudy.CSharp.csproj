@@ -77,18 +77,20 @@
   <ItemGroup>
     <Compile Include="Assets\Demigiant\DOTween\Examples\Basics.cs" />
     <Compile Include="Assets\Demigiant\DOTween\Examples\Sequences.cs" />
-    <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\GameBasic\GameManager.cs" />
+    <Compile Include="Assets\Scripts\GameBasic\RuleManager.cs" />
+    <Compile Include="Assets\Scripts\GameBasic\StoneManager.cs" />
+    <Compile Include="Assets\Scripts\GameBasic\ToolManager.cs" />
     <Compile Include="Assets\Scripts\GameModeSelect.cs" />
     <Compile Include="Assets\Scripts\MessageCenter\AccountManager.cs" />
     <Compile Include="Assets\Scripts\MessageCenter\MatchManager.cs" />
+    <Compile Include="Assets\Scripts\MessageCenter\NetGame.cs" />
+    <Compile Include="Assets\Scripts\MessageCenter\NetworkManager.cs" />
     <Compile Include="Assets\Scripts\MessageCenter\ProcessNetMessage.cs" />
-    <Compile Include="Assets\Scripts\NetGame.cs" />
-    <Compile Include="Assets\Scripts\NetworkManager.cs" />
-    <Compile Include="Assets\Scripts\RuleManager.cs" />
     <Compile Include="Assets\Scripts\SingleGame.cs" />
-    <Compile Include="Assets\Scripts\StoneManager.cs" />
+    <Compile Include="Assets\Scripts\Teach\MovieManager.cs" />
+    <Compile Include="Assets\Scripts\Teach\TeachButtonManager.cs" />
     <Compile Include="Assets\Scripts\Test.cs" />
-    <Compile Include="Assets\Scripts\ToolManager.cs" />
     <Compile Include="Assets\Scripts\UIPolygon.cs" />
   </ItemGroup>
   <ItemGroup>

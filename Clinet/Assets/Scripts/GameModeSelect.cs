@@ -42,7 +42,7 @@ public class GameModeSelect : MonoBehaviour {
 
     public void TeachingModeButton()
     {
-        //SceneManager.LoadScene("TeachGame");
+        SceneManager.LoadScene("Teach");
     }
 
     public void ExitButton()

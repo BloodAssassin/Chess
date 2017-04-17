@@ -1,0 +1,26 @@
+fileFormatVersion: 2
+guid: f42dd7f7aa2e28d4ca3156bb0b3465d1
+timeCreated: 1485620392
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - che_black: {fileID: 107820, guid: 9a909e0eff7588b4d954cabd1258276c, type: 2}
+  - ma_black: {fileID: 157844, guid: e7a9c6db0ef76094290f5f6820e7a3a7, type: 2}
+  - xiang_black: {fileID: 177868, guid: 14ff8600efb87f74ab291ab6d8f5b0f0, type: 2}
+  - shi_black: {fileID: 133034, guid: 38e891d4ed9e6d24fa0ef4cb30c9896d, type: 2}
+  - jiang_black: {fileID: 195780, guid: 76e5063fcda62b241a3cac937c4c36bd, type: 2}
+  - pao_black: {fileID: 190184, guid: 9de6c4b6dc3d1ea46bf701c5bdf1e240, type: 2}
+  - bing_black: {fileID: 192340, guid: 968897092d51ee448a443b59d03ca95b, type: 2}
+  - che_red: {fileID: 103788, guid: 9b844d2880d8d55448664e79075af201, type: 2}
+  - ma_red: {fileID: 157232, guid: 982a34e447c813a4aa404a5ba229c7e7, type: 2}
+  - xiang_red: {fileID: 181256, guid: f73e802d70c52ce4c9ac6ae64c2905a5, type: 2}
+  - shi_red: {fileID: 181450, guid: 4211f47e028c1cd4c832baa0ffd0c780, type: 2}
+  - jiang_red: {fileID: 104632, guid: 6127e825abdf91d458793dd35ca34da7, type: 2}
+  - pao_red: {fileID: 128342, guid: 593f005fbf2137144b7112d6a5ceac6f, type: 2}
+  - bing_red: {fileID: 158144, guid: 4efbff6bbf3d33646b4b67a41998a7c7, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
