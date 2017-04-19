@@ -31,7 +31,6 @@ public class TeachButtonManager : MonoBehaviour {
         Menu.SetActive(true);
     }
 
-
     public void btn_ToJiang()
     {
         Panel_Jiang.SetActive(true);

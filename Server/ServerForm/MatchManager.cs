@@ -290,7 +290,7 @@ namespace ServerForm
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        private string GetScore(string email)
+        public string GetScore(string email)
         {
             try
             {
@@ -326,7 +326,7 @@ namespace ServerForm
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        private string GetAllNumber(string email)
+        public string GetAllNumber(string email)
         {
             try
             {
@@ -362,7 +362,7 @@ namespace ServerForm
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        private string GetWinNumber(string email)
+        public string GetWinNumber(string email)
         {
             try
             {
@@ -388,6 +388,42 @@ namespace ServerForm
             catch (Exception ex)
             {
                 MessageBox.Show("根据邮箱查找获胜场次函数报错：" + ex.Message);
+            }
+
+            return "";
+        }
+
+        /// <summary>
+        /// 根据邮箱地址在数据库中查找对应的昵称
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public string GetName(string email)
+        {
+            try
+            {
+                SqlAccess sql = new SqlAccess();
+
+                //从“AccountManager”表中选择“email=email”的“name”的数据
+                DataSet ds = sql.SelectWhere("AccountManager", new string[] { "name" }, new string[] { "email" }, new string[] { "=" }, new string[] { email });
+
+                //遍历这些数据，获取用户的积分
+                if (ds != null)
+                {
+                    DataTable table = ds.Tables[0];
+
+                    foreach (DataRow row in table.Rows)
+                    {
+                        foreach (DataColumn column in table.Columns)
+                        {
+                            return row[column].ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("根据邮箱查找昵称函数报错：" + ex.Message);
             }
 
             return "";

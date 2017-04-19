@@ -14,6 +14,7 @@ public class NetGame : GameManager
     //对手的Email地址
     public static string _rivalEmail = "";
 
+    public bool isGaming;
     public float lastTime;
 
     public GameObject RetractButtonPanel;
@@ -34,6 +35,7 @@ public class NetGame : GameManager
 
     void Start()
     {
+        isGaming = false;
         //每隔5S，向检测对手是否在线
         InvokeRepeating("SendCheckMessageToServer", 0.0f, 5);
     }
@@ -110,6 +112,7 @@ public class NetGame : GameManager
         if (base._beRedTurn != _beSide)
             return;
 
+        FunctionPanel.SetActive(false);
         RetractMessagePanel.SetActive(true);
         WaitingMessage.SetActive(true);
 
@@ -124,6 +127,7 @@ public class NetGame : GameManager
     {
         //告诉服务器自己选择重开，服务器告诉对手玩家已放弃比赛
         Common.connSocket.Close();
+        isGaming = false;
         _rivalIP = "";
         MM._hintMessage.SetActive(false);
         SceneManager.LoadScene("NetGame");
@@ -136,6 +140,7 @@ public class NetGame : GameManager
     {
         //告诉服务器自己选择重开，服务器告诉对手玩家已放弃比赛
         Common.connSocket.Close();
+        isGaming = false;
         _rivalIP = "";
         SceneManager.LoadScene("Menu");
     }
@@ -177,7 +182,16 @@ public class NetGame : GameManager
     /// </summary>
     public void EnableExitPanel()
     {
-        ExitButtonPanel.SetActive(true);
+        if (isGaming)
+        {
+            ExitButtonPanel.SetActive(true);
+        }
+        else
+        {
+            Common.connSocket.Close();
+            _rivalIP = "";
+            SceneManager.LoadScene("Menu");
+        }
     }
 
     /// <summary>
@@ -185,7 +199,7 @@ public class NetGame : GameManager
     /// </summary>
     public void EnableRestartPanel()
     {
-        RestartButtonPanel.SetActive(true);
+        RestartButtonPanel.SetActive(true);        
     }
 
     /// <summary>
@@ -293,6 +307,7 @@ public class NetGame : GameManager
     {      
         //判断自己是红棋还是黑棋
         bool beRedSide = isRed;
+        isGaming = true;
         SM.StoneInit(beRedSide);
         _beSide = beRedSide;
         MM._hintMessage.SetActive(false);
@@ -305,6 +320,7 @@ public class NetGame : GameManager
     {
         MM._hintMessage.SetActive(true);
         MM._hintMessage.GetComponent<Text>().text = "您的对手已离线...";
+        isGaming = false;
         SendRivalExitToServer();
 
         StartCoroutine(ToolManager.DelayToInvokeDo(() => { Restart(); }, 2f));

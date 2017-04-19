@@ -36,6 +36,27 @@ public class NetworkManager : MonoBehaviour
     public static string _myEmail = "";
 
     /// <summary>
+    /// 玩家的昵称
+    /// </summary>
+    public static string _myName = "";
+
+    /// <summary>
+    /// 玩家的获胜场次
+    /// </summary>
+    public static int _myWinNumber;
+
+    /// <summary>
+    /// 玩家的总场次
+    /// </summary>
+    public static int _myAllNumber;
+
+    /// <summary>
+    /// 玩家的积分
+    /// </summary>
+    public static int _myScore;
+
+
+    /// <summary>
     /// 保存服务器来的byte
     /// </summary>
     public static List<byte[]> bufferList = new List<byte[]>();

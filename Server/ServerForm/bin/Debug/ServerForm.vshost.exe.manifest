@@ -78,14 +78,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ServerForm.exe" size="31720">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ServerForm.exe" size="32744">
       <assemblyIdentity name="ServerForm" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>0KSJwVAtMz4P+MtvY5iBq4EGcCkOg7e5gUu18WIccek=</dsig:DigestValue>
+        <dsig:DigestValue>h0ewFGpCfMGBP7d5TlpGqsENDOLDLshfZ8AlwomMyp0=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

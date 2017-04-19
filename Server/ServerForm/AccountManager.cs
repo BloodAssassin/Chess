@@ -118,13 +118,13 @@ namespace ServerForm
                 //查找表中是否已经存在该邮箱，若已存在，则验证密码是否正确；若不存在或者密码不正确，则返回错误信息
                 if (IsExit(ds,password))
                 {
-                    SendMessage(data, ip, email, true);
+                    SendMessage(data, ip, email);
                     sql.Close();
                 }
                 else
-                {
-                    sql.Close();
+                {                   
                     SendMessage(data, ip, false);
+                    sql.Close();
                 }          
             }
             catch (Exception ex)
@@ -285,23 +285,22 @@ namespace ServerForm
         /// <param name="ip"></param>
         /// <param name="email"></param>
         /// <param name="isSucceed"></param>
-        private void SendMessage(byte[] data, string ip, string email, bool isSucceed)
+        private void SendMessage(byte[] data, string ip, string email)
         {
             //编写反馈指令
+            //[ 命令01(2位) | 是否成功(1位) | 账户邮箱(客户端的邮箱20位) | 账户昵称(30位) | 分数(4位) | 胜场(4位) | 总场次(4位) | ...]
             byte[] sendEmail = Encoding.UTF8.GetBytes(email);
+            MatchManager MM = new MatchManager();
+            byte[] sendName = Encoding.UTF8.GetBytes(MM.GetName(email));
+            byte[] sendScore = System.BitConverter.GetBytes(Convert.ToInt32(MM.GetScore(email)));
+            byte[] sendAllNumber = System.BitConverter.GetBytes(Convert.ToInt32(MM.GetAllNumber(email)));
+            byte[] sendWinNumber = System.BitConverter.GetBytes(Convert.ToInt32(MM.GetWinNumber(email)));
 
             List<byte> list = new List<byte>();
             list.Insert(0, data[0]);
             list.Insert(1, data[1]);
 
-            if (isSucceed)
-            {
-                list.Insert(2, 0);
-            }
-            else
-            {
-                list.Insert(2, 1);
-            }
+            list.Insert(2, 0);
 
             list.AddRange(sendEmail);
             //sendEmail 不够20位
@@ -311,7 +310,47 @@ namespace ServerForm
                 {
                     list.Add(0);
                 }
-            }         
+            }
+
+            list.AddRange(sendName);
+            //sendName 不够30位
+            if (sendName.Length < 30)
+            {
+                for (int i = 0; i < 30 - sendName.Length; i++)
+                {
+                    list.Add(0);
+                }
+            }
+
+            list.AddRange(sendScore);
+            //sendScore 不够4位
+            if (sendScore.Length < 4)
+            {
+                for (int i = 0; i < 4 - sendScore.Length; i++)
+                {
+                    list.Add(0);
+                }
+            }
+
+            list.AddRange(sendWinNumber);
+            //sendWinNumber 不够4位
+            if (sendWinNumber.Length < 4)
+            {
+                for (int i = 0; i < 4 - sendWinNumber.Length; i++)
+                {
+                    list.Add(0);
+                }
+            }
+
+            list.AddRange(sendAllNumber);
+            //sendAllNumber 不够4位
+            if (sendAllNumber.Length < 4)
+            {
+                for (int i = 0; i < 4 - sendAllNumber.Length; i++)
+                {
+                    list.Add(0);
+                }
+            }
 
             //发送指令
             if (Common.connSocket.ContainsKey(ip))

@@ -132,15 +132,42 @@ public class AccountManager : MonoBehaviour
     /// <param name="data"></param>
     private void LoginAccount(byte[] data)
     {
-        //[ 命令01(2位) | 是否成功(1位) | 账户邮箱(客户端的邮箱20位) | ...]（若失败则没有客户端的邮箱）
+        //[ 命令01(2位) | 是否成功(1位) | 账户邮箱(客户端的邮箱20位) | 账户昵称(30位) | 分数(4位) | 胜场(4位) | 总场次(4位) | ...]（若失败则没有客户端的邮箱及后面的信息）
         if (data[2] == 0)
         {
-            Debug.Log("登陆成功");
+            Debug.Log("登陆成功"+data.Length);
 
             //获取正在使用的用户账号
             string myEmail = Encoding.UTF8.GetString(data, 3, 20);
             NetworkManager._myEmail = myEmail.Length > 0 ? myEmail.Trim('\0') : "";
             Debug.Log("本地的Email为：" + NetworkManager._myEmail);
+
+            //获取正在使用的用户昵称
+            string myName = Encoding.UTF8.GetString(data, 23, 30);
+            NetworkManager._myName = myName.Length > 0 ? myName.Trim('\0') : "";
+            Debug.Log("本地的Name为：" + NetworkManager._myName);
+
+            //获取正在使用的用户的积分
+            byte[] tmpScore = new byte[4];
+            Array.Copy(data, 53, tmpScore, 0, 4);
+            int score = System.BitConverter.ToInt32(tmpScore, 0);
+            NetworkManager._myScore = score;
+            Debug.Log("本地的Score为：" + NetworkManager._myScore);
+
+            //获取正在使用的用户的胜场
+            byte[] tmpWinNumber = new byte[4];
+            Array.Copy(data, 57, tmpWinNumber, 0, 4);
+            int winNumber = System.BitConverter.ToInt32(tmpWinNumber, 0);
+            NetworkManager._myWinNumber = winNumber;
+            Debug.Log("本地的WinNumber为：" + NetworkManager._myWinNumber);
+
+            //获取正在使用的用户的总场次
+            byte[] tmpAllNumber = new byte[4];           
+            Array.Copy(data, 61, tmpAllNumber, 0, 4);         
+            int allNumber = System.BitConverter.ToInt32(tmpAllNumber, 0);
+            NetworkManager._myAllNumber = allNumber;
+            Debug.Log("本地的AllNumber为：" + NetworkManager._myAllNumber);
+                           
 
             IF_LoginEmail.GetComponent<InputField>().text = "";
             IF_LoginPassword.GetComponent<InputField>().text = "";

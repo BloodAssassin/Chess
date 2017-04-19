@@ -82,17 +82,27 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// 胜利界面
     /// </summary>
-    public GameObject WinPlane;
+    public GameObject WinPanel;
 
     /// <summary>
     /// 失败界面
     /// </summary>
-    public GameObject LosePlane;
+    public GameObject LosePanel;
 
     /// <summary>
     /// 功能界面
     /// </summary>
-    public GameObject FunctionPlane;
+    public GameObject FunctionPanel;
+
+    /// <summary>
+    /// 个人信息界面
+    /// </summary>
+    public GameObject PersonPanel;
+
+    public GameObject txtName;
+    public GameObject txtScore;
+    public GameObject txtRate;
+    public GameObject txtNumber;
 
     #endregion
 
@@ -173,14 +183,14 @@ public class GameManager : MonoBehaviour
             if (StoneManager.s[20]._dead == true)
             {
                 //获胜
-                WinPlane.SetActive(true);
+                WinPanel.SetActive(true);
                 PlayMusic_Win();
             }
 
             if (StoneManager.s[4]._dead == true)
             {
                 //失败
-                LosePlane.SetActive(true);
+                LosePanel.SetActive(true);
                 PlayMusic_Lose();
             }
         }
@@ -190,14 +200,14 @@ public class GameManager : MonoBehaviour
             if (StoneManager.s[4]._dead == true)
             {
                 //获胜
-                WinPlane.SetActive(true);
+                WinPanel.SetActive(true);
                 PlayMusic_Win();
             }
 
             if (StoneManager.s[20]._dead == true)
             {
                 //失败
-                LosePlane.SetActive(true);
+                LosePanel.SetActive(true);
                 PlayMusic_Lose();
             }
         }
@@ -676,7 +686,7 @@ public class GameManager : MonoBehaviour
         step tmpStep = _steps[_steps.Count - 1];
         _steps.RemoveAt(_steps.Count - 1);
         Back(tmpStep);
-        FunctionPlane.SetActive(false);
+        FunctionPanel.SetActive(false);
     }
 
     public virtual void Back()
@@ -742,7 +752,7 @@ public class GameManager : MonoBehaviour
     public void SettingButton()
     {
         Debug.Log("点击到设置按钮");
-        FunctionPlane.SetActive(false);
+        FunctionPanel.SetActive(false);
     }
 
     /// <summary>
@@ -750,7 +760,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void SetPanelDisable()
     {
-        FunctionPlane.SetActive(false);
+        FunctionPanel.SetActive(false);
     }
 
     /// <summary>
@@ -758,7 +768,27 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void SetPanelEnable()
     {
-        FunctionPlane.SetActive(true);
+        FunctionPanel.SetActive(true);
+    }
+
+    /// <summary>
+    /// 显示个人信息界面
+    /// </summary>
+    public void SetPersonPanelEnable()
+    {
+        PersonPanel.SetActive(true);
+        txtName.GetComponent<Text>().text = NetworkManager._myName;
+        txtScore.GetComponent<Text>().text = NetworkManager._myScore.ToString();
+        txtRate.GetComponent<Text>().text = (System.Convert.ToDouble(NetworkManager._myWinNumber) / System.Convert.ToDouble(NetworkManager._myAllNumber) * 100).ToString() + "%";
+        txtNumber.GetComponent<Text>().text = NetworkManager._myAllNumber.ToString() ;
+    }
+
+    /// <summary>
+    /// 隐藏个人信息界面
+    /// </summary>
+    public void SetPersonPanelDisable()
+    {
+        PersonPanel.SetActive(false);
     }
 
     /// <summary>

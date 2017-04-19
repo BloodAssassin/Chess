@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Text;
 using UnityEngine.SceneManagement;
+using System;
 
 public class ProcessNetMessage : MonoBehaviour
 {
@@ -68,10 +69,9 @@ public class ProcessNetMessage : MonoBehaviour
     private void SetMyIP(byte[] buffer)
     {
         string myIP = Encoding.UTF8.GetString(buffer, 1, 25);
-
+       
         NetworkManager._myIP = myIP.Length > 0 ? myIP.Trim('\0') : "";
 
         Debug.Log("本地的IP地址为：" + NetworkManager._myIP);
-
     }
 }
