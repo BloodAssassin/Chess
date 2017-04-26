@@ -99,6 +99,21 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public GameObject PersonPanel;
 
+    /// <summary>
+    /// 设置界面
+    /// </summary>
+    public GameObject SettingPanel;
+
+    /// <summary>
+    /// 是否打开音效的标志
+    /// </summary>
+    public GameObject TrueTick;
+
+    /// <summary>
+    /// 是否打开背景音乐的标志
+    /// </summary>
+    public GameObject TrueTick1;
+
     public GameObject txtName;
     public GameObject txtScore;
     public GameObject txtRate;
@@ -107,6 +122,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region 音乐文件
+
     /// <summary>
     /// 放置棋子的音效
     /// </summary>
@@ -121,6 +137,12 @@ public class GameManager : MonoBehaviour
     /// 失败的音效
     /// </summary>
     public AudioSource loseMusic;
+
+    /// <summary>
+    /// 背景音乐
+    /// </summary>
+    public AudioSource backMusic;
+
     #endregion
 
     void Awake()
@@ -129,7 +151,38 @@ public class GameManager : MonoBehaviour
         normalChess = Resources.LoadAll("_newNormalChess");
         seletcedChess = Resources.LoadAll("_newSelectChess");
         GameObject.Find("ChessBoard").GetComponent<StoneManager>().StoneInit(true);
+
+        clickMusic = GameObject.Find("CSAudioManager").GetComponent<AudioSource>();
+        winMusic = GameObject.Find("WinAudioManager").GetComponent<AudioSource>();
+        loseMusic = GameObject.Find("LoseAudioManager").GetComponent<AudioSource>();
+        backMusic = GameObject.Find("BackAudioManager").GetComponent<AudioSource>();
+
         _beSide = true;
+
+        if (NetworkManager.isMute == true)
+        {
+            TrueTick.SetActive(false);
+            clickMusic.mute = true;
+            winMusic.mute = true;
+            loseMusic.mute = true;
+        }
+        else if (NetworkManager.isMute == false)
+        {
+            TrueTick.SetActive(true);
+            clickMusic.mute = false;
+            winMusic.mute = false;
+            loseMusic.mute = false;
+        }
+        else if (NetworkManager.backIsMute == false)
+        {
+            TrueTick1.SetActive(true);
+            backMusic.mute = false;
+        }
+        else if (NetworkManager.isMute == true)
+        {
+            TrueTick1.SetActive(false);
+            backMusic.mute = true;
+        }
     }
 	
 	void Update () 
@@ -751,8 +804,16 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void SettingButton()
     {
-        Debug.Log("点击到设置按钮");
+        SettingPanel.SetActive(true);
         FunctionPanel.SetActive(false);
+    }
+
+    /// <summary>
+    /// 隐藏设置界面
+    /// </summary>
+    public void SetSettingPanelDisable()
+    {
+        SettingPanel.SetActive(false);
     }
 
     /// <summary>
@@ -779,7 +840,15 @@ public class GameManager : MonoBehaviour
         PersonPanel.SetActive(true);
         txtName.GetComponent<Text>().text = NetworkManager._myName;
         txtScore.GetComponent<Text>().text = NetworkManager._myScore.ToString();
-        txtRate.GetComponent<Text>().text = (System.Convert.ToDouble(NetworkManager._myWinNumber) / System.Convert.ToDouble(NetworkManager._myAllNumber) * 100).ToString() + "%";
+        string tmp = System.String.Format("{0:F}", (System.Convert.ToDouble(NetworkManager._myWinNumber) / System.Convert.ToDouble(NetworkManager._myAllNumber) * 100));
+        if (tmp == "NaN")
+        {
+            txtRate.GetComponent<Text>().text = "0%";
+        }
+        else
+        {
+            txtRate.GetComponent<Text>().text = tmp + "%";
+        }
         txtNumber.GetComponent<Text>().text = NetworkManager._myAllNumber.ToString() ;
     }
 
@@ -805,6 +874,48 @@ public class GameManager : MonoBehaviour
     public virtual void ReturnToMenu()
     {
         SceneManager.LoadScene("Menu");
+    }
+
+    /// <summary>
+    /// 设置音效是否静音
+    /// </summary>
+    public void SetMusicMute()
+    {
+        if (NetworkManager.isMute == true)
+        {
+            TrueTick.SetActive(true);
+            NetworkManager.isMute = false;
+            clickMusic.mute = false;
+            winMusic.mute = false;
+            loseMusic.mute = false;
+        }
+        else if (NetworkManager.isMute == false)
+        {
+            TrueTick.SetActive(false);
+            NetworkManager.isMute = true;
+            clickMusic.mute = true;
+            winMusic.mute = true;
+            loseMusic.mute = true;
+        }    
+    }
+
+    /// <summary>
+    /// 设置背景音乐是否静音
+    /// </summary>
+    public void SetBackMusicMute()
+    {
+        if (NetworkManager.backIsMute == true)
+        {
+            TrueTick1.SetActive(true);
+            NetworkManager.backIsMute = false;
+            backMusic.mute = false;
+        }
+        else if (NetworkManager.backIsMute == false)
+        {
+            TrueTick1.SetActive(false);
+            NetworkManager.backIsMute = true;
+            backMusic.mute = true;
+        }
     }
 
     #endregion

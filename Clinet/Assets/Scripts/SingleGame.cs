@@ -7,9 +7,10 @@ using UnityEngine.SceneManagement;
 public class SingleGame : GameManager {
 
     //enum TYPE{CHE,MA,PAO,BING,JIANG,SHI,XIANG};
-    public static int[] chessScore = {1000,499,501,200,15000,100,100};
+    public static int[] chessScore = { 1000, 499, 501, 200, 15000, 100, 100 };
+    //public static int[] chessScore = { 90, 40, 45, 10, 1500, 20, 20 };
 
-    public int _level = 3;
+    public int _level = 4;
 
     public override void Click(int id, int row, int col)
     {

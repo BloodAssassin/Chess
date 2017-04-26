@@ -17,8 +17,8 @@ public class NetworkManager : MonoBehaviour
     /// <summary>
     /// 连接服务器的ip
     /// </summary>
-    //public static string _ip = "115.159.207.34"; //连接云服务器
-    public static string _ip = "127.0.0.1"; //连接本地
+    public static string _ip = "115.159.207.34"; //连接云服务器
+    //public static string _ip = "127.0.0.1"; //连接本地
 
     /// <summary>
     /// 连接服务器的端口
@@ -65,6 +65,16 @@ public class NetworkManager : MonoBehaviour
     /// 判断客户端是否连接着服务器
     /// </summary>
     public static bool isConnected = false;
+
+    /// <summary>
+    /// 判断音效是否静音
+    /// </summary>
+    public static bool isMute = false;
+
+    /// <summary>
+    /// 判断背景音乐是否静音
+    /// </summary>
+    public static bool backIsMute = false;
 
     /// <summary>
     /// 判断客户端是否尝试重新连接服务器
@@ -222,7 +232,7 @@ public class Common
     /// <summary>
     /// 保存当登陆成功后。从服务器获取的所有用户ip
     /// </summary>
-    public static string ip;
+    //public static string ip;
 
     /// <summary>
     /// time计时器

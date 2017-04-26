@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class GameModeSelect : MonoBehaviour {
 
     public GameObject ErrorPanel;
+    public GameObject StatePanel;
 
     public GameObject NetworkUnavailable;
     public GameObject PassbyMode;
@@ -45,6 +46,19 @@ public class GameModeSelect : MonoBehaviour {
         SceneManager.LoadScene("Teach");
     }
 
+    public void StateButton()
+    {
+        StatePanel.SetActive(true);
+    }
+
+    public void LogoutButton()
+    {
+        SceneManager.LoadScene("Login");
+    }
+
+    
+
+
     public void ExitButton()
     {
         Application.Quit();  
@@ -60,4 +74,11 @@ public class GameModeSelect : MonoBehaviour {
         PassbyMode.SetActive(false);
     }
 
+    /// <summary>
+    /// 将游戏说明的panel设置为不可见
+    /// </summary>
+    public void btn_SetStatePanelDisable()
+    {
+        StatePanel.SetActive(false);
+    }
 }

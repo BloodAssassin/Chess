@@ -49,6 +49,8 @@ public class AccountManager : MonoBehaviour
     public GameObject NameOrPasswordWrongful;
     //注册时输入的邮箱不合法
     public GameObject EmailWrongful;
+    //注册时的邮箱已经被注册
+    public GameObject EmailExistent;
 
     //找回密码时邮箱不存在
     public GameObject EmailNonexistent;
@@ -122,7 +124,8 @@ public class AccountManager : MonoBehaviour
         {
             Debug.Log("注册失败");
             //弹出消息窗，告知用户注册失败
-            //在弹出窗中点击确认键，回到注册界面
+            ErrorPanel.SetActive(true);
+            EmailExistent.SetActive(true);
         }
     }
 
