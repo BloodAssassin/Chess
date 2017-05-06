@@ -43,7 +43,7 @@ public class GameModeSelect : MonoBehaviour {
 
     public void TeachingModeButton()
     {
-        SceneManager.LoadScene("Teach");
+        SceneManager.LoadScene("PhoneTeach");
     }
 
     public void StateButton()

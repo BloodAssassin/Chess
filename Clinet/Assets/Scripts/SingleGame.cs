@@ -6,11 +6,10 @@ using UnityEngine.SceneManagement;
 
 public class SingleGame : GameManager {
 
-    //enum TYPE{CHE,MA,PAO,BING,JIANG,SHI,XIANG};
-    public static int[] chessScore = { 1000, 499, 501, 200, 15000, 100, 100 };
-    //public static int[] chessScore = { 90, 40, 45, 10, 1500, 20, 20 };
+    //enum TYPE { JIANG, CHE, PAO, MA, BING, SHI, XIANG };
+    public static int[] chessScore = { 15000, 1000, 501, 499, 200, 100, 100 };
 
-    public int _level = 4;
+    public int _level = 3;
 
     public override void Click(int id, int row, int col)
     {
@@ -39,13 +38,15 @@ public class SingleGame : GameManager {
     /// <returns></returns>
     step GetBestMove()
     {
+        step ret;
+
         //1.看看有哪些步骤可以走
         List<step> steps = new List<step>();
         GetAllPossibleMove(ref steps);
 
         //2.试着走一下,评估走的结果
         int maxInAllMinScore = -300000;
-        step ret = steps[0];
+        ret = steps[steps.Count - 1];
         while(steps.Count!=0)
         {
             step tmpStep = steps[steps.Count-1];

@@ -484,7 +484,8 @@ public class AccountManager : MonoBehaviour
         {
             string email = IF_LoginEmail.GetComponent<InputField>().text;
             string password = IF_LoginPassword.GetComponent<InputField>().text;
-
+            Debug.Log("点击了登录按钮");
+            NetworkManager.isPassby = false;
             SendLoginMessageToServer(email, password);
         }
         else
